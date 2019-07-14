@@ -41,23 +41,30 @@ def load_xml(abs_path):
 
 
 if __name__ == '__main__':
-    abs_path = '/home/scrapy_pay_client/ui.xml'
-    R = load_xml(abs_path)
-    print(R[3][1], R[4][1], R[5][1], R[8][1], R[9][1], R[11][1])
-    is_my_page = 0
-    for x in R:
-        if str(x[1]).__eq__("我的") or str(x[1]).__eq__("账单") or str(x[1]).__eq__("银行卡"):
-            is_my_page += 1
-    if is_my_page >= 2:
-        print("当前页是 我的 页面")
+    abs_path = '/home/scrapy_pay_client/bill.xml'
+    result_list = load_xml(abs_path)
+    print(result_list[3][1], result_list[4][1], result_list[5][1], result_list[8][1], result_list[9][1],
+          result_list[11][1])
+    income_list = list()
+    for x in result_list:
+        # print(x)
+        data = {
+        }
+        if str(x[1]).find("收钱码收款") >= 0:
+            index = result_list.index(x)
+            for i in range(5):
+                if i == 0:
+                    data["user"] = result_list[index + i][1]
+                elif i == 1:
+                    data["money"] = result_list[index + i][1]
+                    data["click_x_y"] = result_list[index + i][2]
+                elif i == 2:
+                    data["goods"] = result_list[index + i][1]
+                elif i == 3:
+                    data["today"] = result_list[index + i][1]
+                elif i == 4:
+                    data["time"] = result_list[index + i][1]
+                print(data)
+            income_list.append(data)
 
-    for x in R:
-        print(x)
-        # if str(x[1]).find("收钱码收款") >= 0:
-        #     index = x[0]
-        #     # print(x[0], x[1], x[2])
-        #     print(R[index][0], R[index][1], R[index][2])
-        #     print(R[index + 1][0], R[index + 1][1], R[index + 1][2])
-        #     print(R[index + 2][0], R[index + 2][1], R[index + 2][2])
-        #     print(R[index + 3][0], R[index + 3][1], R[index + 3][2])
-        #     print(R[index + 4][0], R[index + 4][1], R[index + 4][2])
+    print(income_list)

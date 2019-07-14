@@ -1,3 +1,4 @@
+import datetime
 import os
 
 from src.service.parse_xml import load_xml
@@ -7,6 +8,35 @@ class AlipayXmlData:
     def __init__(self):
         self.abs_detail_path = "/home/scrapy_pay_client/bill_detail.xml"
         self.abs_my_path = "/home/scrapy_pay_client/my_page.xml"
+        self.abs_personal_path = "/home/scrapy_pay_client/personal_page.xml"
+        self.abs_x_path = "/home/scrapy_pay_client/x_page.xml"
+        self.abs_bill_coordinate_path = "/home/scrapy_pay_client/bill_coordinate_page.xml"
+        self.abs_bill_path = "/home/scrapy_pay_client/bill_list_page.xml"
+
+    def __dump_x_page_xml(self):
+        """
+        生成判断账单的点击坐标页面
+        """
+        os.system("rm -f " + self.abs_x_path)
+        os.system("adb shell uiautomator dump /sdcard/x.xml")
+        os.system("adb pull /sdcard/x.xml " + self.abs_x_path)
+
+    def __dump_bill_page_xml(self):
+        """
+        生成bill　list　页面
+        """
+        os.system("rm -f " + self.abs_bill_path)
+        os.system("adb shell uiautomator dump /sdcard/bill_list_page.xml")
+        os.system("adb pull /sdcard/bill_list_page.xml " + self.abs_bill_path)
+
+    def __dump_personal_page_xml(self):
+        """
+        生成个人信息页面用于获取支付宝账户
+        :return:
+        """
+        os.system("rm -f " + self.abs_personal_path)
+        os.system("adb shell uiautomator dump /sdcard/personal_page.xml")
+        os.system("adb pull /sdcard/personal_page.xml " + self.abs_personal_path)
 
     def __dump_my_page_xml(self):
         """
@@ -15,6 +45,14 @@ class AlipayXmlData:
         os.system("rm -f " + self.abs_my_path)
         os.system("adb shell uiautomator dump /sdcard/my_page.xml")
         os.system("adb pull /sdcard/my_page.xml " + self.abs_my_path)
+
+    def __dump_bill_coordinate_page_xml(self):
+        """
+        导出我的页面并仅提供给提取 账单的坐标提取使用 xml
+        """
+        os.system("rm -f " + self.abs_bill_coordinate_path)
+        os.system("adb shell uiautomator dump /sdcard/bill_coordinate_page.xml")
+        os.system("adb pull /sdcard/bill_coordinate_page.xml " + self.abs_bill_coordinate_path)
 
     def __dump_detail_xml(self):
         """
@@ -46,6 +84,61 @@ class AlipayXmlData:
         print(data)
         return data
 
+    def get_alipay_account(self):
+        """
+        获取支付宝账户信息
+        :return: 支付宝账户
+        """
+        if self.is_personal_apge():
+            result_list = load_xml(self.abs_personal_path)
+            for result in result_list:
+                if str(result[1]).__eq__("支付宝账号"):
+                    index = result_list.index(result)
+                    alipay_account = result_list[index + 1][1]
+                    return alipay_account
+        else:
+            return None
+
+    def find_page_keywords(self, keyworkds, frequency=1):
+        """
+        根据支付宝页面的关键词进行检查当前是否在当前页，关键词比如 “我的” 是
+        我的页面的关键词，出现2次，频率为2次匹配才算在指定页面，默认最少1次
+        :param keyworkds: 关键词，一般为页面独一为二的关键词
+        :param frequency: 出现在特殊页面的频次
+        :return: True/False
+        """
+        self.__dump_x_page_xml()
+        result_list = load_xml(self.abs_x_path)
+        count = 0
+        for result in result_list:
+            if str(result[1]).__eq__(keyworkds):
+                count += 1
+        print(count)
+        if count >= frequency:
+            return True
+        else:
+            return False
+
+    def is_personal_apge(self):
+        """
+        是否是个人页面
+        :return:True/False
+        """
+        self.__dump_personal_page_xml()
+        is_personal = False
+        is_personal_page = False
+        result_list = load_xml(self.abs_personal_path)
+        for result in result_list:
+            if str(result[1]).__eq__("个人信息"):
+                is_personal = True
+            if str(result[1]).__eq__("个人主页"):
+                is_personal_page = True
+
+        if is_personal and is_personal_page:
+            return True
+        else:
+            return False
+
     def is_user_center_page(self):
         """
         判断当前支付宝所在页面是否是 "我的" 页面
@@ -66,8 +159,87 @@ class AlipayXmlData:
         else:
             return False
 
+    def get_bill_click_x_y(self):
+        """
+        获取 账单的点击坐标 x y
+        :return:
+        """
+        if self.is_user_center_page():
+            self.__dump_bill_coordinate_page_xml()
+            result_list = load_xml(self.abs_bill_coordinate_path)
+            for result in result_list:
+                if str(result[1]).__eq__("账单"):
+                    data = result[2]
+                    data = str(data).replace('][', '|').replace('[', '').replace(']', '')
+                    datas = data.split("|")
+                    arr = str(datas[1]).split(",")
+                    print(arr)
+                    x = int(arr[0])
+                    y = int(arr[1]) - 20
+                    print(x, y)
+                    return x, y
+        else:
+            return False
+
+    def income_list(self, num=5):
+        """
+        获取收入的列表
+        :param num:　读取多少条默认５条
+        :return: list
+        """
+        self.__dump_bill_page_xml()
+        result_list = load_xml(self.abs_bill_path)
+        income_list = list()
+        for x in result_list:
+            data = {
+                "user": None,
+                "money": 0,
+                "goods": None,
+                "today": None,
+                "time": None,
+                "click_x_y": None,
+            }
+            if str(x[1]).find("收钱码收款") >= 0:
+                index = result_list.index(x)
+                for i in range(num):
+                    try:
+                        if i == 0:
+                            data["user"] = str(result_list[index + i][1]).replace("收钱码收款-来自", "")
+                        elif i == 1:
+                            money = str(result_list[index + i][1])
+                            if money.find("-") >= 0:
+                                return
+                            else:
+                                money = money.replace("+", "")
+                            data["money"] = float(money)
+                            data["click_x_y"] = result_list[index + i][2]
+                        elif i == 2:
+                            data["goods"] = result_list[index + i][1]
+                        elif i == 3:
+                            today = str(result_list[index + i][1])
+                            if today.__eq__("今天"):
+                                data["today"] = str(datetime.datetime.now().strftime('%Y%m%d%'))
+                            elif today.__eq__("昨天"):
+                                today = datetime.date.today()
+                                oneday = datetime.timedelta(days=1)
+                                yesterday = today - oneday
+                                data["today"] = str(yesterday)
+
+                        elif i == 4:
+                            data["time"] = str(result_list[index + i][1])
+                        print(data)
+                    except:
+                        pass
+
+                income_list.append(data)
+        return income_list
+
 
 if __name__ == '__main__':
     alipay = AlipayXmlData()
     # alipay.detail()
-    print(alipay.is_user_center_page())
+    # print(alipay.is_user_center_page())
+    # print(alipay.is_personal_apge())
+    # print(alipay.get_alipay_account())
+    # print(alipay.get_bill_click_x_y())
+    print(alipay.income_list())

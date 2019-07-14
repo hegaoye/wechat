@@ -104,10 +104,45 @@ class AliPay:
         order_time_img_path = self.crop(670, 840, 1050, 900, src_filename, "order_time_" + src_filename)
         return src_filename, order_no_img_path, order_money_img_path, order_state_img_path, order_time_img_path
 
+    def get_alipay_account(self):
+        """
+        读取alipay account
+        :return: alipay account
+        """
+        alipayxmldata = AlipayXmlData()
+        if alipayxmldata.is_user_center_page():
+            # 从我的页面进入到个人信息页面 点击坐标 850,320
+            self.click(850, 320)
+            time.sleep(.5)
+            alipay_account = alipayxmldata.get_alipay_account()
+            self.back()
+            if alipay_account:
+                return alipay_account
+            else:
+                return None
+
+    def jump_to_my_page(self):
+        alipayxmldata = AlipayXmlData()
+        is_user_center_page = alipayxmldata.find_page_keywords("我的", 1)
+        if is_user_center_page:
+            # 点击我的菜单页进入我的页面
+            self.click(980, 2240)
+            time.sleep(.5)
+            if alipayxmldata.is_user_center_page():
+                return True
+            else:
+                return False
+        else:
+            self.back()
+            time.sleep(.5)
+            self.jump_to_my_page()
+
     def run_xml(self):
         # 1.点击账单
-        # self.click(600, 1300)
+        self.jump_to_my_page()
         alipayxmldata = AlipayXmlData()
+        x, y = alipayxmldata.get_bill_click_x_y()
+        self.click(x, y)
         # 列表间距查295 px
         for i in range(5):
             self.click(810, 500 + 295 * i)
@@ -172,3 +207,5 @@ if __name__ == "__main__":
     pay_ali = AliPay()
     # pay_ali.run()
     pay_ali.run_xml()
+    # print(pay_ali.get_alipay_account())
+    # pay_ali.jump_to_my_page()
