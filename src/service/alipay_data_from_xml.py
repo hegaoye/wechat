@@ -212,7 +212,13 @@ class AlipayXmlData:
                             else:
                                 money = money.replace("+", "")
                             data["money"] = float(money)
-                            data["click_x_y"] = result_list[index + i][2]
+                            str_data = str(result_list[index + i][2])
+                            str_data = str_data.replace("][", "|").replace("[", "").replace("]", "")
+                            str_data_arr = str_data.split("|")
+                            arr = str(str_data_arr[1]).split(",")
+                            x = int(arr[0])
+                            y = int(arr[1]) - 20
+                            data["click_x_y"] = [x, y]
                         elif i == 2:
                             data["goods"] = result_list[index + i][1]
                         elif i == 3:
@@ -227,11 +233,12 @@ class AlipayXmlData:
 
                         elif i == 4:
                             data["time"] = str(result_list[index + i][1])
-                        print(data)
                     except:
                         pass
+                # 不符合数据规范的进行排除
+                if not (not data["time"] or not data["today"] or data["click_x_y"][1] < 0):
+                    income_list.append(data)
 
-                income_list.append(data)
         return income_list
 
 

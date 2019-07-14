@@ -137,6 +137,14 @@ class AliPay:
             time.sleep(.5)
             self.jump_to_my_page()
 
+    def income_list(self):
+        """
+        获取账单页面列表信息
+        :return:
+        """
+        alipayxmldata = AlipayXmlData()
+        return alipayxmldata.income_list(5)
+
     def run_xml(self):
         # 1.点击账单
         self.jump_to_my_page()
