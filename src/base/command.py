@@ -2,7 +2,5 @@ from enum import Enum
 
 
 class Command(Enum):
-    Start = "start"
-    Stop = "stop"
-    Input = "input"
-    EOF = "EOF"
+    Detect = "Detect"
+    Sleep = "Sleep"

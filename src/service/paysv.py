@@ -1,4 +1,4 @@
-from src.base.http import post
+from src.base.http import post, get
 from src.dao.bill_dao import BillDao
 from src.service.alipay import AliPay
 from src.service.basesv import BaseSV
@@ -44,3 +44,53 @@ class PaySV(BaseSV):
             # bill_dao.insert(order_no,)
             alipay.back()
             pass
+
+    def detect_income(self):
+        """
+        监听是否有新的支付订单
+        １.进入账单页面
+        ２.读取订单列表
+        ３.读取订单详情
+        ４.验证订单合法性
+        ５.提交订单
+        ６.缓存结果
+        :return:
+        """
+        # １.进入账单页面
+        alipay = AliPay()
+        alipay.jump_to_my_page()
+
+        # ２.读取订单列表
+        income_list = alipay.income_list()
+        for income in income_list:
+            # ３.读取订单详情
+            chick_x_y = income["chick_x_y"]
+            data = alipay.order_detail(chick_x_y[0], chick_x_y[1])
+            alipay.back()
+            # ４.验证订单合法性
+            order_no = data["orderNo"]
+            bill_dao = BillDao()
+            bill_record = bill_dao.load(order_no)
+            if bill_record:
+                continue
+
+            # ５.提交订单
+            # TODO md5 签名 md5(order_no,money,state,time)
+            sign = ""
+            data["sign"] = sign
+            beanret = post(self.new_record_Url, data)
+            if beanret.success:
+                # ６.缓存结果
+                # bill_dao.insert(order_no,)
+                pass
+
+    def load_cmd(self):
+        """
+        获取云端监听信号，如果获得信息为detect命令，则进行监听，否则系统进行等待
+        :return:
+        """
+        beanret = get(self.load_cmd())
+        if beanret.success:
+            return True
+        else:
+            return False

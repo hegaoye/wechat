@@ -20,3 +20,4 @@ class BaseSV:
         self.notifyUri = self.host + '/devicePool/notify.shtml?code={code}&domain={domain}'
 
         self.new_record_Url = ""
+        self.load_cmd_Url = ""

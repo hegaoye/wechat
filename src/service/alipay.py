@@ -143,7 +143,21 @@ class AliPay:
         :return:
         """
         alipayxmldata = AlipayXmlData()
-        return alipayxmldata.income_list(5)
+        x, y = alipayxmldata.get_bill_click_x_y()
+        self.click(x, y)
+        time.sleep(.5)
+        income_list = alipayxmldata.income_list(5)
+        return income_list
+
+    def order_detail(self, x, y):
+        """
+        读取订单支付详情信息
+        :return:　data
+        """
+        self.click(x, y)
+        time.sleep(.5)
+        alipayxmldata = AlipayXmlData()
+        return alipayxmldata.detail()
 
     def run_xml(self):
         # 1.点击账单
