@@ -1,4 +1,5 @@
 from src.base.http import post, get
+from src.dao.account_dao import AccountDao
 from src.dao.bill_dao import BillDao
 from src.service.alipay import AliPay
 from src.service.basesv import BaseSV
@@ -75,9 +76,6 @@ class PaySV(BaseSV):
                 continue
 
             # ５.提交订单
-            # TODO md5 签名 md5(order_no,money,state,time)
-            sign = ""
-            data["sign"] = sign
             beanret = post(self.new_record_Url, data)
             if beanret.success:
                 # ６.缓存结果
@@ -91,6 +89,29 @@ class PaySV(BaseSV):
         """
         beanret = get(self.load_cmd())
         if beanret.success:
+            return True
+        else:
+            return False
+
+    def configure(self):
+        """
+        登录系统进行配置
+        :return:
+        """
+        alipay = AliPay()
+        alipay.jump_to_my_page()
+        account = alipay.get_alipay_account()
+        if not account:
+            return
+        data = {
+            "account": account,
+            "password": None
+        }
+        beanret = post(self.configure_Url, data)
+        if beanret.success:
+            token = str(beanret.data)
+            account_dao = AccountDao()
+            account_dao.update(token)
             return True
         else:
             return False

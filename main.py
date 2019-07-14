@@ -9,6 +9,8 @@ class Main:
         上线并获取基本信息给到服务器端
         :return:
         """
+        pay_sv = PaySV()
+        return pay_sv.configure()
 
     def run(self, frequency=3):
         """
@@ -25,5 +27,10 @@ class Main:
 
 
 if __name__ == '__main__':
-    app = Main()
-    app.run()
+    try:
+        app = Main()
+        flag = app.configure()
+        if flag:
+            app.run()
+    except Exception as e:
+        print(e)

@@ -21,3 +21,4 @@ class BaseSV:
 
         self.new_record_Url = ""
         self.load_cmd_Url = ""
+        self.configure_Url = ""
