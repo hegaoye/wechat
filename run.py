@@ -19,8 +19,8 @@ class Main:
         """
         pay_sv = PaySV()
         while True:
-            is_detect = pay_sv.load_cmd()
-            if is_detect:
+            is_notify = pay_sv.detect_alipay_notify()
+            if is_notify:
                 pay_sv.detect_income()
             else:
                 time.sleep(frequency)

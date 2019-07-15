@@ -1,51 +1,14 @@
-from src.base.http import post, get
+from src.base.command import Command
+from src.base.http import post
 from src.base.md5 import md5
 from src.dao.account_dao import AccountDao
 from src.dao.bill_dao import BillDao
+from src.dao.setting_dao import SettingDao
 from src.service.alipay import AliPay
 from src.service.basesv import BaseSV
 
 
 class PaySV(BaseSV):
-
-    def check_paid_order_no(self):
-        """
-        验证支付订单号服务器端是否已经存在
-        1.获取订单号，付款信息，个人信息，交易状态，交易时间
-        2.查询本地是否缓存存在
-        3.发送云端验证，缓存本地
-        :return:
-        """
-        alipay = AliPay()
-        src_filename, order_no_img_path, order_money_img_path, order_state_img_path, order_time_img_path = alipay.crop_order_detail()
-        # 1.获取订单号，付款信息，个人信息，交易状态，交易时间
-        # 解析订单号
-        order_no = alipay.image_to_text(order_no_img_path)
-        # 2.查询本地是否缓存存在
-        bill_dao = BillDao()
-        bill_record = bill_dao.load(order_no)
-        if bill_record:
-            alipay.back()
-            return
-
-        # 3.发送云端验证，缓存本地
-        order_money = alipay.image_to_text(order_money_img_path)
-        order_state = alipay.image_to_text(order_state_img_path, "chi_sim")
-        order_time = alipay.image_to_text(order_time_img_path)
-        # TODO md5 签名 md5(order_no,money,state,time)
-        sign = ""
-        data = {
-            "orderNo": str(order_no),
-            "money": str(order_money),
-            "state": str(order_state),
-            "time": str(order_time),
-            "sign": str(sign)
-        }
-        beanret = post(self.new_record_Url, data)
-        if beanret.success:
-            # bill_dao.insert(order_no,)
-            alipay.back()
-            pass
 
     def detect_income(self):
         """
@@ -53,7 +16,7 @@ class PaySV(BaseSV):
         １.进入账单页面
         ２.读取订单列表
         ３.读取订单详情
-        ４.验证订单合法性
+        ４.验证订单是否重复
         ５.提交订单
         ６.缓存结果
         :return:
@@ -70,7 +33,7 @@ class PaySV(BaseSV):
             data = alipay.order_detail(chick_x_y[0], chick_x_y[1])
             alipay.back()
 
-            # ４.验证订单合法性
+            # ４.验证订单是否重复
             order_no = data["orderNo"]
             bill_dao = BillDao()
             bill_record = bill_dao.load(order_no)
@@ -78,46 +41,72 @@ class PaySV(BaseSV):
                 continue
 
             # ５.提交订单
+            setting_dao = SettingDao()
+            appkey_setting = setting_dao.load(Command.Appkey)
+            if not appkey_setting:
+                return
+            appkey = appkey_setting["v"]
+
+            account_dao = AccountDao()
+            account_user = account_dao.load(appkey)
+            if not account_user:
+                return
+
+            user = data["user"]
+            money = data["money"]
+            state = data["state"]
+            time_str = data["time"]
+            text = str(order_no) + "&" + str(user) + "&" + str(money) + "&" + str(state) + "&" + str(
+                time_str) + "&" + appkey
+
+            sign = md5(text)
+            data["sign"] = sign
+            data["token"] = account_user["token"]
             beanret = post(self.new_record_Url, data)
             if beanret.success:
                 # ６.缓存结果
-                user = data["user"]
-                money = data["money"]
-                state = data["state"]
-                time_str = data["time"]
-                text = str(order_no) + str(user) + str(money) + str(state) + str(time_str)
-                bill_dao.insert(order_no, user, money, state, md5(text), time_str)
+                bill_dao.insert(order_no, user, money, state, sign, time_str)
 
-    def load_cmd(self):
+    def detect_alipay_notify(self):
         """
-        获取云端监听信号，如果获得信息为detect命令，则进行监听，否则系统进行等待
-        :return:
+        监听支付宝的通知信息
+        :return: True/False
         """
-        beanret = get(self.load_cmd())
-        if beanret.success:
-            return True
-        else:
-            return False
+        alipay = AliPay()
+        return alipay.detect_alilpay_notify()
 
     def configure(self):
         """
-        登录系统进行配置
-        :return:
+        登录系统
+        :return: True/False
         """
         alipay = AliPay()
         alipay.jump_to_my_page()
         account = alipay.get_alipay_account()
         if not account:
             return
+        setting_dao = SettingDao()
+        appkey_setting = setting_dao.load(Command.Appkey)
+        if not appkey_setting:
+            return
+        appkey = appkey_setting["v"]
+
         data = {
             "account": account,
-            "password": None
+            "appkey": appkey,
+            "sign": md5(account + "&" + appkey + "&" + appkey)
         }
+
         beanret = post(self.configure_Url, data)
         if beanret.success:
-            token = str(beanret.data)
+            setting = setting_dao.load(Command.Sys)
             account_dao = AccountDao()
-            account_dao.update(token)
+            token = str(beanret.data)
+            if str(setting["v"]).__eq__(Command.Sys_Init.value):
+                setting_dao.update(Command.Sys, Command.Sys_Login.value)
+                account_dao.insert(account, appkey, token)
+            else:
+                account_dao.update(account, token)
             return True
         else:
             return False

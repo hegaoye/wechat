@@ -1,0 +1,37 @@
+# coding=utf-8
+from src.base.databasetools import Sqlite3Tools
+
+
+class SettingDao:
+    def __init__(self):
+        self.db = Sqlite3Tools()
+
+    def load(self, key_enum):
+        db = Sqlite3Tools()
+        sql = 'select * from setting where key="' + str(key_enum.value) + '"'
+        return db.load(sql)
+
+    def update(self, key_enum, value):
+        """
+        更新设置值
+        :param key_enum:键枚举
+        :param value:值
+        """
+        sql = 'update setting set v="' + str(value) + '"  where key="' + key_enum.value + '"'
+        self.db.update(sql)
+
+    def insert(self, order_no, user, money, state, md5, order_time):
+        """
+        保存订单记录
+        :param order_no: 支付订单号
+        :param user: 支付者
+        :param money: 支付金额
+        :param state: 支付状态
+        :param md5: md5值
+        :param order_time: 交易时间
+        :return:
+        """
+        sql = "insert into bill('order_no','user','money','state','md5','order_time') " \
+              "VALUES ('" + str(order_no) + "','" + str(user) + "','" + str(money) + "','" \
+              + str(state) + "','" + str(md5) + "','" + str(order_time) + "') "
+        self.db.insert(sql)
