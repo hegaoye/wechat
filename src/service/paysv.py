@@ -1,5 +1,3 @@
-import time
-
 from src.base.beanret import BeanRet
 from src.base.command import Command
 from src.base.log4py import logger
@@ -12,6 +10,8 @@ from src.service.basesv import BaseSV
 
 
 class PaySV(BaseSV):
+    def __init__(self):
+        self.alipay = AliPay()
 
     def detect_income(self):
         """
@@ -25,21 +25,20 @@ class PaySV(BaseSV):
         :return:
         """
         # １.进入账单页面
-        alipay = AliPay()
-        alipay.back_to_desktop()
-        alipay.open_alipay_app()
-        alipay.jump_to_my_page()
+        self.alipay.back_to_desktop()
+        self.alipay.open_alipay_app()
+        self.alipay.jump_to_my_page()
 
         # ２.读取订单列表
-        income_list = alipay.income_list(page=1)
+        income_list = self.alipay.income_list(page=1)
         if income_list.__len__() <= 0:
             return
 
         for income in income_list:
             # ３.读取订单详情
             chick_x_y = income["click_x_y"]
-            data = alipay.order_detail(chick_x_y[0], chick_x_y[1])
-            alipay.back()
+            data = self.alipay.order_detail(chick_x_y[0], chick_x_y[1])
+            self.alipay.back()
 
             print(income["money"], income["time"])
 
@@ -87,19 +86,17 @@ class PaySV(BaseSV):
         监听支付宝的通知信息
         :return: True/False
         """
-        alipay = AliPay()
-        return alipay.detect_alilpay_notify()
+        return self.alipay.detect_alilpay_notify()
 
     def configure(self):
         """
         登录系统
         :return: True/False
         """
-        alipay = AliPay()
-        alipay.back_to_desktop()
-        alipay.open_alipay_app()
-        alipay.jump_to_my_page()
-        account = alipay.get_alipay_account()
+        self.alipay.back_to_desktop()
+        self.alipay.open_alipay_app()
+        self.alipay.jump_to_my_page()
+        account = self.alipay.get_alipay_account()
         if not account:
             return
         setting_dao = SettingDao()
