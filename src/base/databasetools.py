@@ -5,6 +5,7 @@
 import sqlite3
 
 from settings import DATABASE_PATH
+from src.base.log4py import logger
 
 
 class Sqlite3Tools:
@@ -63,6 +64,7 @@ class Sqlite3Tools:
         """
         conn = self.getConn()
         cursor = conn.cursor()
+        logger.debug(sql)
         results = cursor.execute(sql)
         obj = None
         for result in results:

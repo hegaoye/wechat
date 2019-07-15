@@ -12,9 +12,8 @@ class BillDao:
         :param order_no: 订单号
         :return: Bill
         """
-        db = Sqlite3Tools()
         sql = 'select * from bill where order_no="' + order_no + '"'
-        return db.load(sql)
+        return self.db.load(sql)
 
     def insert(self, order_no, user, money, state, md5, order_time):
         """

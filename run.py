@@ -29,8 +29,9 @@ class Main:
 if __name__ == '__main__':
     try:
         app = Main()
-        flag = app.configure()
-        if flag:
-            app.run()
+        # flag = app.configure()
+        # if flag:
+        #     app.run()
+        app.run()
     except Exception as e:
         print(e)

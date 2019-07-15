@@ -1,8 +1,8 @@
 from urllib import request, parse
 
-from src import logger
 from src.base.beanret import BeanRet
 from src.base.command import Command
+from src.base.log4py import logger
 from src.dao.setting_dao import SettingDao
 
 

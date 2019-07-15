@@ -7,9 +7,11 @@ class AccountDao:
         self.db = Sqlite3Tools()
 
     def load(self, appkey):
-        db = Sqlite3Tools()
         sql = 'select * from user where appkey="' + appkey + '"'
-        return db.load(sql)
+        result = self.db.load(sql)
+        if result:
+            return {"account": result[0], "appkey": result[1], "token": result[2]}
+        return None
 
     def update(self, account, token):
         """

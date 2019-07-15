@@ -1,5 +1,7 @@
+from src.base.beanret import BeanRet
 from src.base.command import Command
 from src.base.http import post
+from src.base.log4py import logger
 from src.base.md5 import md5
 from src.dao.account_dao import AccountDao
 from src.dao.bill_dao import BillDao
@@ -23,13 +25,15 @@ class PaySV(BaseSV):
         """
         # １.进入账单页面
         alipay = AliPay()
+        alipay.back_to_desktop()
+        alipay.open_alipay_app()
         alipay.jump_to_my_page()
 
         # ２.读取订单列表
         income_list = alipay.income_list()
         for income in income_list:
             # ３.读取订单详情
-            chick_x_y = income["chick_x_y"]
+            chick_x_y = income["click_x_y"]
             data = alipay.order_detail(chick_x_y[0], chick_x_y[1])
             alipay.back()
 
@@ -62,7 +66,10 @@ class PaySV(BaseSV):
             sign = md5(text)
             data["sign"] = sign
             data["token"] = account_user["token"]
-            beanret = post(self.new_record_Url, data)
+            # TODO 调试后端接口
+            beanret = BeanRet()
+            beanret.success = True
+            # beanret = post(self.new_record_Url, data)
             if beanret.success:
                 # ６.缓存结果
                 bill_dao.insert(order_no, user, money, state, sign, time_str)
@@ -81,6 +88,8 @@ class PaySV(BaseSV):
         :return: True/False
         """
         alipay = AliPay()
+        alipay.back_to_desktop()
+        alipay.open_alipay_app()
         alipay.jump_to_my_page()
         account = alipay.get_alipay_account()
         if not account:
@@ -97,7 +106,14 @@ class PaySV(BaseSV):
             "sign": md5(account + "&" + appkey + "&" + appkey)
         }
 
-        beanret = post(self.configure_Url, data)
+        logger.debug(data)
+        print(data)
+        # TODO 调试后端接口
+        beanret = BeanRet()
+        beanret.success = True
+        beanret.data = "you_are_logined"
+        # beanret = post(self.configure_Url, data)
+
         if beanret.success:
             setting = setting_dao.load(Command.Sys)
             account_dao = AccountDao()

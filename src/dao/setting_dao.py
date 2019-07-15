@@ -7,9 +7,11 @@ class SettingDao:
         self.db = Sqlite3Tools()
 
     def load(self, key_enum):
-        db = Sqlite3Tools()
         sql = 'select * from setting where key="' + str(key_enum.value) + '"'
-        return db.load(sql)
+        result = self.db.load(sql)
+        if result:
+            return {"key": result[0], "v": result[1]}
+        return None
 
     def update(self, key_enum, value):
         """
