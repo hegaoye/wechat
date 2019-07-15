@@ -1,6 +1,7 @@
+import time
+
 from src.base.beanret import BeanRet
 from src.base.command import Command
-from src.base.http import post
 from src.base.log4py import logger
 from src.base.md5 import md5
 from src.dao.account_dao import AccountDao
@@ -30,12 +31,18 @@ class PaySV(BaseSV):
         alipay.jump_to_my_page()
 
         # ２.读取订单列表
-        income_list = alipay.income_list()
+        income_list = alipay.income_list(page=1)
+        if income_list.__len__() <= 0:
+            return
+
         for income in income_list:
             # ３.读取订单详情
             chick_x_y = income["click_x_y"]
             data = alipay.order_detail(chick_x_y[0], chick_x_y[1])
             alipay.back()
+            time.sleep(.5)
+
+            print(income["money"], income["time"])
 
             # ４.验证订单是否重复
             order_no = data["orderNo"]
@@ -72,7 +79,9 @@ class PaySV(BaseSV):
             # beanret = post(self.new_record_Url, data)
             if beanret.success:
                 # ６.缓存结果
-                bill_dao.insert(order_no, user, money, state, sign, time_str)
+                bill_obj = bill_dao.load(order_no)
+                if not bill_obj:
+                    bill_dao.insert(order_no, user, money, state, sign, time_str)
 
     def detect_alipay_notify(self):
         """
