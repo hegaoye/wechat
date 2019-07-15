@@ -10,6 +10,7 @@ from src.service.alipay_data_from_xml import AlipayXmlData
 class AliPay:
     def __init__(self):
         self.setting_dao = SettingDao()
+        self.alipayxmldata = AlipayXmlData()
 
     def click(self, x, y):
         """
@@ -80,12 +81,11 @@ class AliPay:
         检测是否有alipay的通知，无论什么通知均返回有通知结果
         :return:  True/False
         """
-        alipayxmldata = AlipayXmlData()
         self.back_to_desktop()
         time.sleep(.1)
         self.open_notify_pannel()
         time.sleep(.1)
-        notify_count = alipayxmldata.notify_list()
+        notify_count = self.alipayxmldata.notify_list()
         # TODO 清理通知
         self.back_to_desktop()
         time.sleep(.1)
@@ -98,14 +98,13 @@ class AliPay:
         """
         在桌面上寻找alipay的位置，并打开
         """
-        alipayxmldata = AlipayXmlData()
         app_x_y_setting = self.setting_dao.load(Command.App_x_y)
         if app_x_y_setting:
             x_y = str(app_x_y_setting["v"])
             x_y_arr = x_y.split(",")
             self.click(x_y_arr[0], x_y_arr[1])
         else:
-            x, y = alipayxmldata.find_alipay_x_y()
+            x, y = self.alipayxmldata.find_alipay_x_y()
             self.setting_dao.insert(Command.App_x_y, str(x) + "," + str(y))
             self.click(x, y)
         time.sleep(.2)
@@ -115,12 +114,11 @@ class AliPay:
         读取alipay account
         :return: alipay account
         """
-        alipayxmldata = AlipayXmlData()
-        if alipayxmldata.is_user_center_page():
+        if self.alipayxmldata.is_user_center_page():
             # 从我的页面进入到个人信息页面 点击坐标 850,320
             self.click(850, 320)
             time.sleep(.5)
-            alipay_account = alipayxmldata.get_alipay_account()
+            alipay_account = self.alipayxmldata.get_alipay_account()
             self.back()
             if alipay_account:
                 return alipay_account
@@ -128,13 +126,12 @@ class AliPay:
                 return None
 
     def jump_to_my_page(self):
-        alipayxmldata = AlipayXmlData()
-        is_user_center_page = alipayxmldata.find_page_keywords("我的", 1)
+        is_user_center_page = self.alipayxmldata.find_page_keywords("我的", 1)
         if is_user_center_page:
             # 点击我的菜单页进入我的页面
             self.click(980, 2240)
             time.sleep(.5)
-            if alipayxmldata.is_user_center_page():
+            if self.alipayxmldata.is_user_center_page():
                 return True
             else:
                 return False
@@ -147,21 +144,20 @@ class AliPay:
         获取账单页面列表信息
         :return:
         """
-        alipayxmldata = AlipayXmlData()
         bill_x_y_setting = self.setting_dao.load(Command.Bill_x_y)
         if bill_x_y_setting:
             x_y = str(bill_x_y_setting["v"])
             x_y_arr = x_y.split(",")
             self.click(x_y_arr[0], x_y_arr[1])
         else:
-            x, y = alipayxmldata.get_bill_click_x_y()
+            x, y = self.alipayxmldata.get_bill_click_x_y()
             self.setting_dao.insert(Command.Bill_x_y, str(x) + "," + str(y))
             self.click(x, y)
 
         time.sleep(.5)
         all_list = list()
         for i in range(page):
-            income_list = alipayxmldata.income_list(limit)
+            income_list = self.alipayxmldata.income_list(limit)
             print(income_list)
             if income_list.__len__() > 0:
                 all_list.extend(income_list)
@@ -178,8 +174,7 @@ class AliPay:
         """
         self.click(x, y)
         time.sleep(.5)
-        alipayxmldata = AlipayXmlData()
-        return alipayxmldata.detail()
+        return self.alipayxmldata.detail()
 
 
 if __name__ == "__main__":
