@@ -40,7 +40,6 @@ class PaySV(BaseSV):
             chick_x_y = income["click_x_y"]
             data = alipay.order_detail(chick_x_y[0], chick_x_y[1])
             alipay.back()
-            time.sleep(.5)
 
             print(income["money"], income["time"])
 

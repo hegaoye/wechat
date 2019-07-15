@@ -2,10 +2,14 @@
 import os
 import time
 
+from src.base.command import Command
+from src.dao.setting_dao import SettingDao
 from src.service.alipay_data_from_xml import AlipayXmlData
 
 
 class AliPay:
+    def __init__(self):
+        self.setting_dao = SettingDao()
 
     def click(self, x, y):
         """
@@ -17,6 +21,7 @@ class AliPay:
         x1 = str(x)
         y1 = str(y)
         os.system('adb shell input tap ' + x1 + ' ' + y1)
+        time.sleep(.2)
 
     def swipe(self, x1, y1, x2, y2):
         """
@@ -32,40 +37,35 @@ class AliPay:
         x2 = str(x2)
         y2 = str(y2)
         os.system('adb shell input swipe ' + x1 + ' ' + y1 + ' ' + x2 + ' ' + y2)
-
-    def screen_cap(self, file_name):
-        """
-        截屏，并保存到 指定目录，最后从手机中拉取到本地项目下进行处理
-        :param path:
-        :return:
-        """
-        file_name = str(file_name)
-        os.system('adb shell screencap -p /sdcard/' + file_name)
-        os.system('adb pull /sdcard/' + file_name)
+        time.sleep(.2)
 
     def back(self):
         """
         返回一步
         """
         os.system("adb shell input keyevent 4")
+        time.sleep(.5)
 
     def back_to_desktop(self):
         """
         回到桌面
         """
         os.system("adb shell input keyevent 3")
+        time.sleep(.2)
 
     def open_notify_pannel(self):
         """
         打开通知栏信息
         """
         os.system("adb shell input swipe 900 0 900 900 100")
+        time.sleep(.2)
 
     def refresh_bill_list(self, ms=500):
         """
         下拉刷新页面
         """
         os.system("adb shell input swipe 900 600 900 2300 " + str(ms))
+        time.sleep(.2)
 
     def scroll_down(self, ms=300):
         """
@@ -73,6 +73,7 @@ class AliPay:
         :param ms:下滑时间长度
         """
         os.system("adb shell input swipe 900 900 400 400 " + str(ms))
+        time.sleep(.2)
 
     def detect_alilpay_notify(self):
         """
@@ -96,11 +97,18 @@ class AliPay:
     def open_alipay_app(self):
         """
         在桌面上寻找alipay的位置，并打开
-        :return:
         """
         alipayxmldata = AlipayXmlData()
-        x, y = alipayxmldata.find_alipay_x_y()
-        self.click(x, y)
+        app_x_y_setting = self.setting_dao.load(Command.App_x_y)
+        if app_x_y_setting:
+            x_y = str(app_x_y_setting["v"])
+            x_y_arr = x_y.split(",")
+            self.click(x_y_arr[0], x_y_arr[1])
+        else:
+            x, y = alipayxmldata.find_alipay_x_y()
+            self.setting_dao.insert(Command.App_x_y, str(x) + "," + str(y))
+            self.click(x, y)
+        time.sleep(.2)
 
     def get_alipay_account(self):
         """
@@ -132,7 +140,6 @@ class AliPay:
                 return False
         else:
             self.back()
-            time.sleep(.5)
             self.jump_to_my_page()
 
     def income_list(self, limit=5, page=2):
@@ -141,8 +148,16 @@ class AliPay:
         :return:
         """
         alipayxmldata = AlipayXmlData()
-        x, y = alipayxmldata.get_bill_click_x_y()
-        self.click(x, y)
+        bill_x_y_setting = self.setting_dao.load(Command.Bill_x_y)
+        if bill_x_y_setting:
+            x_y = str(bill_x_y_setting["v"])
+            x_y_arr = x_y.split(",")
+            self.click(x_y_arr[0], x_y_arr[1])
+        else:
+            x, y = alipayxmldata.get_bill_click_x_y()
+            self.setting_dao.insert(Command.Bill_x_y, str(x) + "," + str(y))
+            self.click(x, y)
+
         time.sleep(.5)
         all_list = list()
         for i in range(page):

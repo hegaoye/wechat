@@ -9,3 +9,5 @@ class Command(Enum):
     Sys = "Sys"
     Host = "Host"
     Appkey = "Appkey"
+    App_x_y = "App_x_y"
+    Bill_x_y = "Bill_x_y"

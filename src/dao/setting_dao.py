@@ -22,7 +22,7 @@ class SettingDao:
         sql = 'update setting set v="' + str(value) + '"  where key="' + key_enum.value + '"'
         self.db.update(sql)
 
-    def insert(self, order_no, user, money, state, md5, order_time):
+    def insert(self, key_enum, value):
         """
         保存订单记录
         :param order_no: 支付订单号
@@ -33,7 +33,6 @@ class SettingDao:
         :param order_time: 交易时间
         :return:
         """
-        sql = "insert into bill('order_no','user','money','state','md5','order_time') " \
-              "VALUES ('" + str(order_no) + "','" + str(user) + "','" + str(money) + "','" \
-              + str(state) + "','" + str(md5) + "','" + str(order_time) + "') "
+        sql = "insert into setting('key','v') " \
+              "VALUES ('" + str(key_enum.value) + "','" + str(value) + "') "
         self.db.insert(sql)
