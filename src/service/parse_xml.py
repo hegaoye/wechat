@@ -95,7 +95,8 @@ if __name__ == '__main__':
         # print(x)
         node.to_obj(x)
         if node.text.__eq__("支付宝通知"):
-            print(x)
+            print(node.get_bounds()[0])
+            print(node.get_bounds()[1])
 
     list_attr = list_attr_value(abs_path, "resource-id", "delete")
     for attr in list_attr:

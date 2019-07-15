@@ -1,23 +1,36 @@
-# coding=utf-8
-import configparser
-import logging.config
+import time
 
-from src import app
+from src.service.paysv import PaySV
 
-if __name__ == "__main__":
-    from gevent import pywsgi
-    from geventwebsocket.handler import WebSocketHandler
 
-    logging.config.fileConfig('logging.conf')
-    log = logging.getLogger(__name__)
-    log.info('>>>>> Starting server <<<<<')
+class Main:
+    def configure(self):
+        """
+        上线并获取基本信息给到服务器端
+        :return:
+        """
+        pay_sv = PaySV()
+        return pay_sv.configure()
+
+    def run(self, frequency=3):
+        """
+        开启监听支付结果
+        :param frequency: 监听频率
+        """
+        pay_sv = PaySV()
+        while True:
+            is_detect = pay_sv.load_cmd()
+            if is_detect:
+                pay_sv.detect_income()
+            else:
+                time.sleep(frequency)
+
+
+if __name__ == '__main__':
     try:
-        # start flask service
-        cf = configparser.ConfigParser()
-        cf.read(app.config['PITOP_CONF'], encoding='UTF-8')
-        local_port = cf.get("sys", "local_port")
-        log.info("The Server  port [" + local_port + "]")
-        server = pywsgi.WSGIServer(('0.0.0.0', int(local_port)), app, log=log, handler_class=WebSocketHandler)
-        server.serve_forever()
+        app = Main()
+        flag = app.configure()
+        if flag:
+            app.run()
     except Exception as e:
-        log.error("server starting failed")
+        print(e)

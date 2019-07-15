@@ -4,6 +4,8 @@
 """
 import sqlite3
 
+from settings import DATABASE_PATH
+
 
 class Sqlite3Tools:
     def __init__(self):
@@ -11,8 +13,7 @@ class Sqlite3Tools:
         链接数据库
         :param dbPath: 数据库文件路径
         """
-        # TODO 修改路径获取数据库
-        # self.dbPath = app.config['DATABASE_URI']
+        self.dbPath = DATABASE_PATH
 
     def getConn(self):
         """

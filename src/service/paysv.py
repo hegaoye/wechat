@@ -1,4 +1,5 @@
 from src.base.http import post, get
+from src.base.md5 import md5
 from src.dao.account_dao import AccountDao
 from src.dao.bill_dao import BillDao
 from src.service.alipay import AliPay
@@ -68,6 +69,7 @@ class PaySV(BaseSV):
             chick_x_y = income["chick_x_y"]
             data = alipay.order_detail(chick_x_y[0], chick_x_y[1])
             alipay.back()
+
             # ４.验证订单合法性
             order_no = data["orderNo"]
             bill_dao = BillDao()
@@ -79,8 +81,12 @@ class PaySV(BaseSV):
             beanret = post(self.new_record_Url, data)
             if beanret.success:
                 # ６.缓存结果
-                # bill_dao.insert(order_no,)
-                pass
+                user = data["user"]
+                money = data["money"]
+                state = data["state"]
+                time_str = data["time"]
+                text = str(order_no) + str(user) + str(money) + str(state) + str(time_str)
+                bill_dao.insert(order_no, user, money, state, md5(text), time_str)
 
     def load_cmd(self):
         """

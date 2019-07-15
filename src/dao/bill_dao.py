@@ -16,39 +16,18 @@ class BillDao:
         sql = 'select * from bill where order_no="' + order_no + '"'
         return db.load(sql)
 
-    def queryLogs(self):
+    def insert(self, order_no, user, money, state, md5, order_time):
         """
-        查询日志集合，通过job进行分组
+        保存订单记录
+        :param order_no: 支付订单号
+        :param user: 支付者
+        :param money: 支付金额
+        :param state: 支付状态
+        :param md5: md5值
+        :param order_time: 交易时间
         :return:
         """
-        sql = "select * from logs group by job"
-        results = self.db.query(sql)
-        list = []
-        for row in results:
-            list.append(
-                {'id': row[0], 'code': row[1], 'job': row[2], 'log': row[3], 'account': row[4], 'createTime': row[5]})
-        return list
-
-    def queryLogsByJob(self, job=None):
-        """
-        查询日志集合
-        :param job: 执行的预定日志 Auth,Lock,DoorLight,BedLight,RoomLight
-        :return:
-        """
-        sql = "select * from logs where job='" + job + "' order by createTime desc"
-        results = self.db.query(sql)
-        list = []
-        for row in results:
-            list.append(
-                {'id': row[0], 'code': row[1], 'job': row[2], 'log': row[3], 'account': row[4], 'createTime': row[5]})
-        return list
-
-    def insert(self, order_no):
-        """
-        保存日志信息
-        :param logpojo: 日志对象
-        """
-        sql = "insert into bill('order_no',order_no,'log','account','createTime') " \
-              "VALUES ('" + str(logpojo.code) + "','" + str(logpojo.job) + "','" + str(logpojo.log) + "','" + str(
-            logpojo.accout) + "','" + logpojo.createTime + "') "
+        sql = "insert into bill('order_no','user','money','state','md5','order_time') " \
+              "VALUES ('" + str(order_no) + "','" + str(user) + "','" + str(money) + "','" \
+              + str(state) + "','" + str(md5) + "','" + str(order_time) + "') "
         self.db.insert(sql)

@@ -8,18 +8,12 @@ import os
 _basedir = os.path.abspath(os.path.dirname(__file__))
 
 # pitop 配置文件
-PITOP_CONF = os.path.join(_basedir, 'pitop.conf')
+PITOP_CONF = os.path.join(_basedir, 'sys.conf')
 
 # cachedata 缓存文件
 CACHEDATA_JSON = os.path.join(_basedir, 'cachedata.json')
 
-# Flask settings
-FLASK_DEBUG = True  # Do not use debug mode in production
-
-# Flask-Restplus settings
-SWAGGER_UI_DOC_EXPANSION = 'list'
-RESTPLUS_VALIDATE = True
-RESTPLUS_MASK_SWAGGER = False
-ERROR_404_HELP = False
+# 数据库配置
+DATABASE_PATH = os.path.join(_basedir, 'data.db')
 
 del os
