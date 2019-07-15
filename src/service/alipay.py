@@ -104,6 +104,15 @@ class AliPay:
         order_time_img_path = self.crop(670, 840, 1050, 900, src_filename, "order_time_" + src_filename)
         return src_filename, order_no_img_path, order_money_img_path, order_state_img_path, order_time_img_path
 
+    def open_alipay_app(self):
+        """
+        在桌面上寻找alipay的位置，并打开
+        :return:
+        """
+        alipayxmldata = AlipayXmlData()
+        x, y = alipayxmldata.find_alipay_x_y()
+        self.click(x, y)
+
     def get_alipay_account(self):
         """
         读取alipay account
@@ -228,6 +237,9 @@ class AliPay:
 if __name__ == "__main__":
     pay_ali = AliPay()
     # pay_ali.run()
-    pay_ali.run_xml()
-    # print(pay_ali.get_alipay_account())
-    # pay_ali.jump_to_my_page()
+    # pay_ali.run_xml()
+    pay_ali.open_alipay_app()
+    pay_ali.jump_to_my_page()
+    print(pay_ali.get_alipay_account())
+    print(pay_ali.income_list())
+

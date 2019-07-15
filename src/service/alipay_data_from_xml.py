@@ -12,6 +12,15 @@ class AlipayXmlData:
         self.abs_x_path = "/home/scrapy_pay_client/x_page.xml"
         self.abs_bill_coordinate_path = "/home/scrapy_pay_client/bill_coordinate_page.xml"
         self.abs_bill_path = "/home/scrapy_pay_client/bill_list_page.xml"
+        self.abs_alipay_app_path = "/home/scrapy_pay_client/alipay_app.xml"
+
+    def __dump_alipay_app_xml(self):
+        """
+        获取支付宝在桌面的数据文件
+        """
+        os.system("rm -f " + self.abs_alipay_app_path)
+        os.system("adb shell uiautomator dump /sdcard/alipay_app.xml")
+        os.system("adb pull /sdcard/alipay_app.xml " + self.abs_alipay_app_path)
 
     def __dump_x_page_xml(self):
         """
@@ -66,6 +75,20 @@ class AlipayXmlData:
         os.system("adb shell uiautomator dump /sdcard/bill_detail.xml")
         # 2.下载xml到本地
         os.system("adb pull /sdcard/bill_detail.xml " + self.abs_detail_path)
+
+    def find_alipay_x_y(self):
+        self.__dump_alipay_app_xml()
+        result_list = load_xml(self.abs_alipay_app_path)
+        for result in result_list:
+            if str(result[1]).find("支付宝") >= 0:
+                data = result[2]
+                data = str(data).replace('][', '|').replace('[', '').replace(']', '')
+                datas = data.split("|")
+                arr1 = str(datas[0]).split(",")
+                arr2 = str(datas[1]).split(",")
+                x = int(arr1[0]) + (int(arr2[0]) - int(arr1[0])) / 2
+                y = int(arr1[1]) + (int(arr2[1]) - int(arr1[1])) / 2
+                return x, y
 
     def detail(self):
         """
