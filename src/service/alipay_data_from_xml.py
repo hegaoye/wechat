@@ -1,18 +1,28 @@
 import datetime
 import os
 
+from src.service.node import Node
 from src.service.parse_xml import load_xml
 
 
 class AlipayXmlData:
     def __init__(self):
+        self.abs_alipay_app_path = "/home/scrapy_pay_client/alipay_app.xml"
+        self.abs_alipay_notify_path = "/home/scrapy_pay_client/notify.xml"
         self.abs_detail_path = "/home/scrapy_pay_client/bill_detail.xml"
         self.abs_my_path = "/home/scrapy_pay_client/my_page.xml"
         self.abs_personal_path = "/home/scrapy_pay_client/personal_page.xml"
         self.abs_x_path = "/home/scrapy_pay_client/x_page.xml"
         self.abs_bill_coordinate_path = "/home/scrapy_pay_client/bill_coordinate_page.xml"
         self.abs_bill_path = "/home/scrapy_pay_client/bill_list_page.xml"
-        self.abs_alipay_app_path = "/home/scrapy_pay_client/alipay_app.xml"
+
+    def __dump_alipay_notify_xml(self):
+        """
+        获取通知栏信息
+        """
+        os.system("rm -f " + self.abs_alipay_notify_path)
+        os.system("adb shell uiautomator dump /sdcard/notify.xml")
+        os.system("adb pull /sdcard/notify.xml " + self.abs_alipay_notify_path)
 
     def __dump_alipay_app_xml(self):
         """
@@ -80,8 +90,9 @@ class AlipayXmlData:
         self.__dump_alipay_app_xml()
         result_list = load_xml(self.abs_alipay_app_path)
         for result in result_list:
-            if str(result[1]).find("支付宝") >= 0:
-                data = result[2]
+            node = Node().to_obj(result)
+            if node.text.find("支付宝") >= 0:
+                data = node.bounds
                 data = str(data).replace('][', '|').replace('[', '').replace(']', '')
                 datas = data.split("|")
                 arr1 = str(datas[0]).split(",")
@@ -89,6 +100,20 @@ class AlipayXmlData:
                 x = int(arr1[0]) + (int(arr2[0]) - int(arr1[0])) / 2
                 y = int(arr1[1]) + (int(arr2[1]) - int(arr1[1])) / 2
                 return x, y
+
+    def notify_list(self):
+        """
+        统计支付宝支付通知条数
+        :return: 通知总数
+        """
+        self.__dump_alipay_notify_xml()
+        result_list = load_xml(self.abs_alipay_notify_path)
+        count = 0
+        for result in result_list:
+            if Node().to_obj(result).text.__eq__("支付宝通知"):
+                count += 1
+
+        return count
 
     def detail(self):
         """
@@ -98,13 +123,12 @@ class AlipayXmlData:
         self.__dump_detail_xml()
         result_list = load_xml(self.abs_detail_path)
         data = {
-            "user": result_list[3][1],
-            "orderNo": result_list[11][1],
-            "money": str(result_list[4][1]).replace("+", ""),
-            "state": result_list[5][1],
-            "time": result_list[9][1]
+            "user": Node().to_obj(result_list[3]).text,
+            "orderNo": Node().to_obj(result_list[11]).text,
+            "money": Node().to_obj(result_list[4]).text.replace("+", ""),
+            "state": Node().to_obj(result_list[5]).text,
+            "time": Node().to_obj(result_list[9]).text
         }
-        print(data)
         return data
 
     def get_alipay_account(self):
@@ -115,9 +139,10 @@ class AlipayXmlData:
         if self.is_personal_apge():
             result_list = load_xml(self.abs_personal_path)
             for result in result_list:
-                if str(result[1]).__eq__("支付宝账号"):
+                node = Node().to_obj(result)
+                if node.text.__eq__("支付宝账号"):
                     index = result_list.index(result)
-                    alipay_account = result_list[index + 1][1]
+                    alipay_account = Node().to_obj(result_list[index + 1]).text
                     return alipay_account
         else:
             return None
@@ -134,9 +159,9 @@ class AlipayXmlData:
         result_list = load_xml(self.abs_x_path)
         count = 0
         for result in result_list:
-            if str(result[1]).__eq__(keyworkds):
+            node = Node().to_obj(result)
+            if node.text.__eq__(keyworkds):
                 count += 1
-        print(count)
         if count >= frequency:
             return True
         else:
@@ -152,9 +177,10 @@ class AlipayXmlData:
         is_personal_page = False
         result_list = load_xml(self.abs_personal_path)
         for result in result_list:
-            if str(result[1]).__eq__("个人信息"):
+            node = Node().to_obj(result)
+            if node.text.__eq__("个人信息"):
                 is_personal = True
-            if str(result[1]).__eq__("个人主页"):
+            if node.text.__eq__("个人主页"):
                 is_personal_page = True
 
         if is_personal and is_personal_page:
@@ -171,10 +197,11 @@ class AlipayXmlData:
         is_my = False
         is_bill = False
         result_list = load_xml(self.abs_my_path)
-        for x in result_list:
-            if str(x[1]).__eq__("我的"):
+        for result in result_list:
+            node = Node().to_obj(result)
+            if node.text.__eq__("我的"):
                 is_my = True
-            if str(x[1]).__eq__("账单"):
+            if node.text.__eq__("账单"):
                 is_bill = True
 
         if is_my and is_bill:
@@ -191,15 +218,14 @@ class AlipayXmlData:
             self.__dump_bill_coordinate_page_xml()
             result_list = load_xml(self.abs_bill_coordinate_path)
             for result in result_list:
-                if str(result[1]).__eq__("账单"):
-                    data = result[2]
+                node = Node().to_obj(result)
+                if node.text.__eq__("账单"):
+                    data = node.bounds
                     data = str(data).replace('][', '|').replace('[', '').replace(']', '')
                     datas = data.split("|")
                     arr = str(datas[1]).split(",")
-                    print(arr)
                     x = int(arr[0])
                     y = int(arr[1]) - 20
-                    print(x, y)
                     return x, y
         else:
             return False
@@ -213,7 +239,7 @@ class AlipayXmlData:
         self.__dump_bill_page_xml()
         result_list = load_xml(self.abs_bill_path)
         income_list = list()
-        for x in result_list:
+        for income in result_list:
             data = {
                 "user": None,
                 "money": 0,
@@ -222,32 +248,34 @@ class AlipayXmlData:
                 "time": None,
                 "click_x_y": None,
             }
-            if str(x[1]).find("收钱码收款") >= 0:
-                index = result_list.index(x)
+            node = Node().to_obj(income)
+            if node.text.find("收钱码收款") >= 0:
+                index = result_list.index(income)
                 for i in range(num):
                     try:
+                        node_data = Node().to_obj(result_list[index + i])
                         if i == 0:
-                            data["user"] = str(result_list[index + i][1]).replace("收钱码收款-来自", "")
+                            data["user"] = node_data.text.replace("收钱码收款-来自", "")
                         elif i == 1:
-                            money = str(result_list[index + i][1])
+                            money = node_data.text
                             if money.find("-") >= 0:
                                 return
                             else:
                                 money = money.replace("+", "")
-                            data["money"] = float(money)
-                            str_data = str(result_list[index + i][2])
+                                data["money"] = float(money)
+                            str_data = node_data.bounds
                             str_data = str_data.replace("][", "|").replace("[", "").replace("]", "")
                             str_data_arr = str_data.split("|")
                             arr = str(str_data_arr[1]).split(",")
-                            x = int(arr[0])
+                            income = int(arr[0])
                             y = int(arr[1]) - 20
-                            data["click_x_y"] = [x, y]
+                            data["click_x_y"] = [income, y]
                         elif i == 2:
-                            data["goods"] = result_list[index + i][1]
+                            data["goods"] = node_data.text
                         elif i == 3:
-                            today = str(result_list[index + i][1])
+                            today = node_data.text
                             if today.__eq__("今天"):
-                                data["today"] = str(datetime.datetime.now().strftime('%Y%m%d%'))
+                                data["today"] = str(datetime.datetime.now().strftime('%Y%m%d'))
                             elif today.__eq__("昨天"):
                                 today = datetime.date.today()
                                 oneday = datetime.timedelta(days=1)
@@ -255,7 +283,7 @@ class AlipayXmlData:
                                 data["today"] = str(yesterday)
 
                         elif i == 4:
-                            data["time"] = str(result_list[index + i][1])
+                            data["time"] = node_data.text
                     except:
                         pass
                 # 不符合数据规范的进行排除
@@ -267,9 +295,9 @@ class AlipayXmlData:
 
 if __name__ == '__main__':
     alipay = AlipayXmlData()
-    # alipay.detail()
+    print(alipay.detail())
     # print(alipay.is_user_center_page())
     # print(alipay.is_personal_apge())
     # print(alipay.get_alipay_account())
     # print(alipay.get_bill_click_x_y())
-    print(alipay.income_list())
+    # print(alipay.income_list())

@@ -77,23 +77,39 @@ class AliPay:
     def back(self):
         """
         返回一步
-        :return:
         """
         os.system("adb shell input keyevent 4")
+
+    def back_to_desktop(self):
+        """
+        回到桌面
+        """
+        os.system("adb shell input keyevent 3")
+
+    def open_notify_pannel(self):
+        """
+        打开通知栏信息
+        """
+        os.system("adb shell input swipe 900 0 900 900 100")
 
     def refresh_bill_list(self, ms=500):
         """
         下拉刷新页面
         """
         os.system("adb shell input swipe 900 600 900 2300 " + str(ms))
-        time.sleep(.1)
-        os.system("adb shell input swipe 900 600 900 900 " + str(ms))
+
+    def scroll_down(self, ms=300):
+        """
+        向下滑动页面
+        :param ms:下滑时间长度
+        """
+        os.system("adb shell input swipe 900 900 400 400 " + str(ms))
 
     def crop_order_detail(self):
         """
         截屏详情页，并将订单详情页进行分片，精确去除 订单号，支付账户
         支付金额，状态，时间等必要支付信息
-        :return:
+        :return: src_filename, order_no_img_path, order_money_img_path, order_state_img_path, order_time_img_path
         """
         datetime_name = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
         src_filename = 'bill_detail_' + datetime_name + '.png'
@@ -103,6 +119,24 @@ class AliPay:
         order_state_img_path = self.crop(410, 515, 670, 575, src_filename, "order_state_" + src_filename)
         order_time_img_path = self.crop(670, 840, 1050, 900, src_filename, "order_time_" + src_filename)
         return src_filename, order_no_img_path, order_money_img_path, order_state_img_path, order_time_img_path
+
+    def detect_alilpay_notify(self):
+        """
+        检测是否有alipay的通知，无论什么通知均返回有通知结果
+        :return:  True/False
+        """
+        alipayxmldata = AlipayXmlData()
+        self.back_to_desktop()
+        time.sleep(.1)
+        self.open_notify_pannel()
+        time.sleep(.1)
+        notify_count = alipayxmldata.notify_list()
+        self.back_to_desktop()
+        time.sleep(.1)
+        if notify_count > 0:
+            return True
+        else:
+            return False
 
     def open_alipay_app(self):
         """
@@ -146,7 +180,7 @@ class AliPay:
             time.sleep(.5)
             self.jump_to_my_page()
 
-    def income_list(self):
+    def income_list(self, limit=5, page=2):
         """
         获取账单页面列表信息
         :return:
@@ -155,8 +189,17 @@ class AliPay:
         x, y = alipayxmldata.get_bill_click_x_y()
         self.click(x, y)
         time.sleep(.5)
-        income_list = alipayxmldata.income_list(5)
-        return income_list
+        all_list = list()
+        for i in range(page):
+            income_list = alipayxmldata.income_list(limit)
+            print(income_list)
+            if income_list.__len__() > 0:
+                all_list.extend(income_list)
+            if page - 1 - i > 0:
+                self.scroll_down()
+                time.sleep(.5)
+
+        return all_list
 
     def order_detail(self, x, y):
         """
@@ -168,78 +211,81 @@ class AliPay:
         alipayxmldata = AlipayXmlData()
         return alipayxmldata.detail()
 
-    def run_xml(self):
-        # 1.点击账单
-        self.jump_to_my_page()
-        alipayxmldata = AlipayXmlData()
-        x, y = alipayxmldata.get_bill_click_x_y()
-        self.click(x, y)
-        # 列表间距查295 px
-        for i in range(5):
-            self.click(810, 500 + 295 * i)
-            time.sleep(.5)
-            alipayxmldata.detail()
-            self.back()
-            time.sleep(0.5)
+    # def run_xml(self):
+    #     # 1.点击账单
+    #     self.jump_to_my_page()
+    #     alipayxmldata = AlipayXmlData()
+    #     x, y = alipayxmldata.get_bill_click_x_y()
+    #     self.click(x, y)
+    #     # 列表间距查295 px
+    #     for i in range(5):
+    #         self.click(810, 500 + 295 * i)
+    #         time.sleep(.5)
+    #         alipayxmldata.detail()
+    #         self.back()
+    #         time.sleep(0.5)
 
-    def run(self):
-        # 1.点击账单
-        # self.click(600, 1300)
-        time.sleep(0.5)
-        # 2.下拉刷新尝试
-        self.refresh_bill_list(100)
-        time.sleep(0.5)
-        # 列表间距查295 px
-        self.click(810, 500)
-        time.sleep(1)
-        src_filename, order_no_img_path, order_money_img_path, order_state_img_path, order_time_img_path = self.crop_order_detail()
-        self.back()
-        order_no = self.image_to_text(order_no_img_path)
-        order_money = self.image_to_text(order_money_img_path)
-        order_state = self.image_to_text(order_state_img_path, "chi_sim")
-        order_time = self.image_to_text(order_time_img_path)
-        print(order_no, order_money, order_state, order_time)
-        time.sleep(.5)
-
-        self.click(810, 790)
-        time.sleep(1)
-        src_filename, order_no_img_path, order_money_img_path, order_state_img_path, order_time_img_path = self.crop_order_detail()
-        self.back()
-        order_no = self.image_to_text(order_no_img_path)
-        order_money = self.image_to_text(order_money_img_path)
-        order_state = self.image_to_text(order_state_img_path, "chi_sim")
-        order_time = self.image_to_text(order_time_img_path)
-        print(order_no, order_money, order_state, order_time)
-        time.sleep(.5)
-
-        self.click(810, 1085)
-        time.sleep(1)
-        src_filename, order_no_img_path, order_money_img_path, order_state_img_path, order_time_img_path = self.crop_order_detail()
-        self.back()
-        order_no = self.image_to_text(order_no_img_path)
-        order_money = self.image_to_text(order_money_img_path)
-        order_state = self.image_to_text(order_state_img_path, "chi_sim")
-        order_time = self.image_to_text(order_time_img_path)
-        print(order_no, order_money, order_state, order_time)
-        time.sleep(.5)
-
-        self.click(810, 1380)
-        time.sleep(1)
-        src_filename, order_no_img_path, order_money_img_path, order_state_img_path, order_time_img_path = self.crop_order_detail()
-        self.back()
-        order_no = self.image_to_text(order_no_img_path)
-        order_money = self.image_to_text(order_money_img_path)
-        order_state = self.image_to_text(order_state_img_path, "chi_sim")
-        order_time = self.image_to_text(order_time_img_path)
-        print(order_no, order_money, order_state, order_time)
+    # def run(self):
+    #     # 1.点击账单
+    #     # self.click(600, 1300)
+    #     time.sleep(0.5)
+    #     # 2.下拉刷新尝试
+    #     self.refresh_bill_list(100)
+    #     time.sleep(0.5)
+    #     # 列表间距查295 px
+    #     self.click(810, 500)
+    #     time.sleep(1)
+    #     src_filename, order_no_img_path, order_money_img_path, order_state_img_path, order_time_img_path = self.crop_order_detail()
+    #     self.back()
+    #     order_no = self.image_to_text(order_no_img_path)
+    #     order_money = self.image_to_text(order_money_img_path)
+    #     order_state = self.image_to_text(order_state_img_path, "chi_sim")
+    #     order_time = self.image_to_text(order_time_img_path)
+    #     print(order_no, order_money, order_state, order_time)
+    #     time.sleep(.5)
+    #
+    #     self.click(810, 790)
+    #     time.sleep(1)
+    #     src_filename, order_no_img_path, order_money_img_path, order_state_img_path, order_time_img_path = self.crop_order_detail()
+    #     self.back()
+    #     order_no = self.image_to_text(order_no_img_path)
+    #     order_money = self.image_to_text(order_money_img_path)
+    #     order_state = self.image_to_text(order_state_img_path, "chi_sim")
+    #     order_time = self.image_to_text(order_time_img_path)
+    #     print(order_no, order_money, order_state, order_time)
+    #     time.sleep(.5)
+    #
+    #     self.click(810, 1085)
+    #     time.sleep(1)
+    #     src_filename, order_no_img_path, order_money_img_path, order_state_img_path, order_time_img_path = self.crop_order_detail()
+    #     self.back()
+    #     order_no = self.image_to_text(order_no_img_path)
+    #     order_money = self.image_to_text(order_money_img_path)
+    #     order_state = self.image_to_text(order_state_img_path, "chi_sim")
+    #     order_time = self.image_to_text(order_time_img_path)
+    #     print(order_no, order_money, order_state, order_time)
+    #     time.sleep(.5)
+    #
+    #     self.click(810, 1380)
+    #     time.sleep(1)
+    #     src_filename, order_no_img_path, order_money_img_path, order_state_img_path, order_time_img_path = self.crop_order_detail()
+    #     self.back()
+    #     order_no = self.image_to_text(order_no_img_path)
+    #     order_money = self.image_to_text(order_money_img_path)
+    #     order_state = self.image_to_text(order_state_img_path, "chi_sim")
+    #     order_time = self.image_to_text(order_time_img_path)
+    #     print(order_no, order_money, order_state, order_time)
 
 
 if __name__ == "__main__":
     pay_ali = AliPay()
     # pay_ali.run()
     # pay_ali.run_xml()
-    pay_ali.open_alipay_app()
-    pay_ali.jump_to_my_page()
-    print(pay_ali.get_alipay_account())
-    print(pay_ali.income_list())
+    # pay_ali.open_alipay_app()
+    # pay_ali.jump_to_my_page()
+    # print(pay_ali.income_list(limit=5, page=4))
+    # pay_ali.scroll_down()
 
+    flag = pay_ali.detect_alilpay_notify()
+    if flag:
+        pay_ali.open_alipay_app()
