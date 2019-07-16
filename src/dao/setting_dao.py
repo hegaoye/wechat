@@ -7,6 +7,11 @@ class SettingDao:
         self.db = Sqlite3Tools()
 
     def load(self, key_enum):
+        """
+        加载设置
+        :param key_enum: 枚举键
+        :return:
+        """
         sql = 'select * from setting where key="' + str(key_enum.value) + '"'
         result = self.db.load(sql)
         if result:

@@ -27,11 +27,6 @@ class AliPay:
     def swipe(self, x1, y1, x2, y2):
         """
         滑动位置
-        :param x1:
-        :param y1:
-        :param x2:
-        :param y2:
-        :return:
         """
         x1 = str(x1)
         y1 = str(y1)
@@ -84,11 +79,6 @@ class AliPay:
         """
         向下滑动页面，从上向下滑动是大的坐标变小的过程，左下角为0,0的坐标，因此
         x1=x2,y1>y2 则 从y1的高度向下滑动到y2的高度位置
-        :param x1:
-        :param y1:
-        :param x2:
-        :param y2:
-        :return:
         """
         os.system("adb shell input swipe  " + str(x1) + " " + str(y1) + " " + str(x2) + " " + str(y2))
         time.sleep(.2)
@@ -143,6 +133,10 @@ class AliPay:
                 return None
 
     def jump_to_my_page(self):
+        """
+        进入我的页面
+        :return: True/False
+        """
         is_user_center_page = self.alipayxmldata.find_page_keywords("我的", 1)
         if is_user_center_page:
             # 点击我的菜单页进入我的页面
@@ -157,6 +151,9 @@ class AliPay:
             self.jump_to_my_page()
 
     def entry_bill_list_page(self):
+        """
+        进入到账单列表页面
+        """
         is_bill_list_page = self.alipayxmldata.is_bill_list_page()
         if is_bill_list_page:
             self.refresh_bill_list(ms=300)

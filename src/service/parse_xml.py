@@ -26,7 +26,6 @@ def search_data_from_xml(root_node, attr_list, attr, value):
     遍历所有的节点并查询到指定的属性
     :param root_node: 入口节点
     :param attr_list: 遍历集合
-    :return:
     """
     # 获取所有text有数据的node节点
     if str(root_node.tag).__eq__("node") and str(root_node.attrib[attr]).find(value) >= 0:
@@ -54,7 +53,6 @@ def get_data(root_node, result_list, attr="text"):
     遍历所有的节点
     :param root_node: 入口节点
     :param result_list: 遍历集合
-    :return:
     """
     global unique_id
     # 获取所有text有数据的node节点
@@ -85,7 +83,7 @@ def load_xml(abs_path, attr="text"):
     """
     入口
     :param file_name: 文件绝对位置
-    :return:
+    :return: list
     """
     result_list = []
     root = ET.parse(abs_path).getroot()
