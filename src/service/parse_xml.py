@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-import os
 import xml.etree.ElementTree as ET
 
 # 全局唯一标识
@@ -109,5 +108,3 @@ if __name__ == '__main__':
     list_attr = list_attr_value(abs_path, "resource-id", "delete")
     for attr in list_attr:
         print(attr)
-
-
