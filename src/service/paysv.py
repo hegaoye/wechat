@@ -1,3 +1,5 @@
+import time
+
 from src.base.beanret import BeanRet
 from src.base.command import Command
 from src.base.log4py import logger
@@ -13,7 +15,7 @@ class PaySV(BaseSV):
     def __init__(self):
         self.alipay = AliPay()
 
-    def detect_income(self):
+    def detect_income(self, page_count=2):
         """
         监听是否有新的支付订单
         １.进入账单页面
@@ -28,58 +30,71 @@ class PaySV(BaseSV):
         self.alipay.back_to_desktop()
         self.alipay.open_alipay_app()
         self.alipay.jump_to_my_page()
+        self.alipay.entry_bill_list_page()
 
         # ２.读取订单列表
-        income_list = self.alipay.income_list(page=1)
-        if income_list.__len__() <= 0:
-            return
-
-        for income in income_list:
-            # ３.读取订单详情
-            chick_x_y = income["click_x_y"]
-            data = self.alipay.order_detail(chick_x_y[0], chick_x_y[1])
-            self.alipay.back()
-
-            print(income["money"], income["time"])
-
-            # ４.验证订单是否重复
-            order_no = data["orderNo"]
-            bill_dao = BillDao()
-            bill_record = bill_dao.load(order_no)
-            if bill_record:
+        for page in range(page_count):
+            income_list = self.alipay.income_list()
+            if income_list.__len__() <= 0:
                 continue
+            for income in income_list:
+                # ３.读取订单详情
+                chick_x_y = income["click_x_y"]
+                data = self.alipay.order_detail(chick_x_y[0], chick_x_y[1])
+                self.alipay.back()
 
-            # ５.提交订单
-            setting_dao = SettingDao()
-            appkey_setting = setting_dao.load(Command.Appkey)
-            if not appkey_setting:
-                return
-            appkey = appkey_setting["v"]
+                print(income["money"], income["time"])
 
-            account_dao = AccountDao()
-            account_user = account_dao.load(appkey)
-            if not account_user:
-                return
+                # ４.验证订单是否重复
+                order_no = data["orderNo"]
+                bill_dao = BillDao()
+                bill_record = bill_dao.load(order_no)
+                if bill_record:
+                    continue
 
-            user = data["user"]
-            money = data["money"]
-            state = data["state"]
-            time_str = data["time"]
-            text = str(order_no) + "&" + str(user) + "&" + str(money) + "&" + str(state) + "&" + str(
-                time_str) + "&" + appkey
+                # ５.提交订单
+                setting_dao = SettingDao()
+                appkey_setting = setting_dao.load(Command.Appkey)
+                if not appkey_setting:
+                    return
+                appkey = appkey_setting["v"]
 
-            sign = md5(text)
-            data["sign"] = sign
-            data["token"] = account_user["token"]
-            # TODO 调试后端接口
-            beanret = BeanRet()
-            beanret.success = True
-            # beanret = post(self.new_record_Url, data)
-            if beanret.success:
-                # ６.缓存结果
-                bill_obj = bill_dao.load(order_no)
-                if not bill_obj:
-                    bill_dao.insert(order_no, user, money, state, sign, time_str)
+                account_dao = AccountDao()
+                account_user = account_dao.load(appkey)
+                if not account_user:
+                    return
+
+                user = data["user"]
+                money = data["money"]
+                state = data["state"]
+                time_str = data["time"]
+                text = str(order_no) + "&" + str(user) + "&" + str(money) + "&" + str(state) + "&" + str(
+                    time_str) + "&" + appkey
+
+                sign = md5(text)
+                data["sign"] = sign
+                data["token"] = account_user["token"]
+                # TODO 调试后端接口
+                beanret = BeanRet()
+                beanret.success = True
+                # beanret = post(self.new_record_Url, data)
+                if beanret.success:
+                    # ６.缓存结果
+                    bill_obj = bill_dao.load(order_no)
+                    if not bill_obj:
+                        bill_dao.insert(order_no, user, money, state, sign, time_str)
+
+            # 翻页计算
+            if page_count - 1 - page > 0:
+                income_0 = income_list[0]
+                income_last = income_list[income_list.__len__() - 1]
+                x1_y1 = income_0["click_x_y"]
+                x2_y2 = income_last["click_x_y"]
+                if x2_y2[1] >= x1_y1[1]:
+                    self.alipay.scroll_down(x1_y1[0], 1080, x1_y1[0], 480)
+                else:
+                    self.alipay.scroll_down(x1_y1[0], 1080, x1_y1[0], x1_y1[1])
+                time.sleep(.5)
 
     def detect_alipay_notify(self):
         """

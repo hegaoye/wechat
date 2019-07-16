@@ -225,13 +225,7 @@ class AlipayXmlData:
             for result in result_list:
                 node = Node().to_obj(result)
                 if node.text.__eq__("账单"):
-                    data = node.bounds
-                    data = str(data).replace('][', '|').replace('[', '').replace(']', '')
-                    datas = data.split("|")
-                    arr = str(datas[1]).split(",")
-                    x = int(arr[0])
-                    y = int(arr[1]) - 20
-                    return x, y
+                    return node.get_bounds()
         else:
             return False
 

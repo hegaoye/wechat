@@ -68,12 +68,17 @@ class AliPay:
         os.system("adb shell input swipe 900 600 900 2300 " + str(ms))
         time.sleep(.5)
 
-    def scroll_down(self, ms=300):
+    def scroll_down(self, x1, y1, x2, y2):
         """
-        向下滑动页面
-        :param ms:下滑时间长度
+        向下滑动页面，从上向下滑动是大的坐标变小的过程，左下角为0,0的坐标，因此
+        x1=x2,y1>y2 则 从y1的高度向下滑动到y2的高度位置
+        :param x1:
+        :param y1:
+        :param x2:
+        :param y2:
+        :return:
         """
-        os.system("adb shell input swipe 900 900 400 400 " + str(ms))
+        os.system("adb shell input swipe  " + str(x1) + " " + str(y1) + " " + str(x2) + " " + str(y2))
         time.sleep(.2)
 
     def detect_alilpay_notify(self):
@@ -139,11 +144,7 @@ class AliPay:
             self.back()
             self.jump_to_my_page()
 
-    def income_list(self, limit=5, page=2):
-        """
-        获取账单页面列表信息
-        :return:
-        """
+    def entry_bill_list_page(self):
         bill_x_y_setting = self.setting_dao.load(Command.Bill_x_y)
         if bill_x_y_setting:
             x_y = str(bill_x_y_setting["v"])
@@ -153,19 +154,16 @@ class AliPay:
             x, y = self.alipayxmldata.get_bill_click_x_y()
             self.setting_dao.insert(Command.Bill_x_y, str(x) + "," + str(y))
             self.click(x, y)
-
         time.sleep(.5)
-        all_list = list()
-        for i in range(page):
-            income_list = self.alipayxmldata.income_list(limit)
-            print(income_list)
-            if income_list.__len__() > 0:
-                all_list.extend(income_list)
-            if page - 1 - i > 0:
-                self.scroll_down()
-                time.sleep(.5)
 
-        return all_list
+    def income_list(self, limit=5):
+        """
+        获取账单页面列表信息
+        :return:
+        """
+        income_list = self.alipayxmldata.income_list(limit)
+        print(income_list)
+        return income_list
 
     def order_detail(self, x, y):
         """

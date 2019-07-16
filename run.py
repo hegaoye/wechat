@@ -15,6 +15,7 @@ class Main:
     def run(self, frequency=3):
         """
         开启监听支付结果
+
         :param frequency: 监听频率
         """
         pay_sv = PaySV()
