@@ -1,13 +1,20 @@
 # -*- coding: UTF-8 -*-
 import xml.etree.ElementTree as ET
 
-# 全局唯一标识
 from src.service.node import Node
 
+# 全局唯一标识
 unique_id = 1
 
 
 def list_attr_value(abs_path, attr, value):
+    """
+    根据属性和值特性来查询具体的数据
+    :param abs_path: xml绝对位置
+    :param attr: 搜索属性
+    :param value: 属性可能的值，用的是包含查询
+    :return: list
+    """
     attr_list = []
     root = ET.parse(abs_path).getroot()
     search_data_from_xml(root, attr_list, attr, value)
