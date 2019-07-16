@@ -1,5 +1,9 @@
 from enum import Enum
 
+"""
+设置等指令枚举
+"""
+
 
 class Command(Enum):
     Detect = "Detect"
