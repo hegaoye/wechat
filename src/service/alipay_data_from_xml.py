@@ -3,7 +3,7 @@ import os
 
 from src.base.xml_path_enum import XMLPath
 from src.service.node import Node
-from src.service.parse_xml import load_xml
+from src.service.parse_xml import load_xml, list_attr_value
 
 
 class AlipayXmlData:
@@ -114,11 +114,20 @@ class AlipayXmlData:
         self.__dump_alipay_notify_xml()
         result_list = load_xml(self.abs_alipay_notify_path)
         count = 0
-        for result in result_list:
-            if Node().to_obj(result).text.__eq__("支付宝通知"):
-                count += 1
-
+        if result_list.__len__() > 0:
+            for result in result_list:
+                if Node().to_obj(result).text.__eq__("支付宝通知"):
+                    count += 1
         return count
+
+    def get_click_clear_notify_x_y(self):
+        """
+        找到清理通知的坐标
+        :return: x,y
+        """
+        result_list = list_attr_value(self.abs_alipay_notify_path, "resource-id", "delete")
+        if result_list.__len__() > 0:
+            return Node().to_obj(result_list[0]).get_bounds()
 
     def detail(self):
         """

@@ -15,3 +15,5 @@ class Command(Enum):
     Appkey = "Appkey"
     App_x_y = "App_x_y"
     Bill_x_y = "Bill_x_y"
+    Scroll_Page_Size = "Scroll_Page_Size"
+    Screen_x_y = "Screen_x_y"

@@ -91,10 +91,12 @@ class AliPay:
         self.open_notify_pannel()
         time.sleep(.1)
         notify_count = self.alipayxmldata.notify_list()
-        # TODO 清理通知
-        self.back_to_desktop()
-        time.sleep(.1)
         if notify_count > 0:
+            # 清理通知
+            x, y = self.alipayxmldata.get_click_clear_notify_x_y()
+            self.click(x, y)
+            self.back_to_desktop()
+            time.sleep(.1)
             return True
         else:
             return False

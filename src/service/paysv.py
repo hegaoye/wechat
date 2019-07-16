@@ -14,8 +14,9 @@ from src.service.basesv import BaseSV
 class PaySV(BaseSV):
     def __init__(self):
         self.alipay = AliPay()
+        self.page_count = int(self.alipay.setting_dao.load(Command.Scroll_Page_Size)["v"])
 
-    def detect_income(self, page_count=2):
+    def detect_income(self):
         """
         监听是否有新的支付订单
         １.进入账单页面
@@ -33,7 +34,7 @@ class PaySV(BaseSV):
         self.alipay.entry_bill_list_page()
 
         # ２.读取订单列表
-        for page in range(page_count):
+        for page in range(self.page_count):
             income_list = self.alipay.income_list()
             if income_list.__len__() <= 0:
                 continue
@@ -43,13 +44,12 @@ class PaySV(BaseSV):
                 data = self.alipay.order_detail(chick_x_y[0], chick_x_y[1])
                 self.alipay.back()
 
-                print(income["money"], income["time"])
-
                 # ４.验证订单是否重复
                 order_no = data["orderNo"]
                 bill_dao = BillDao()
                 bill_record = bill_dao.load(order_no)
                 if bill_record:
+                    print("重复单跳过，进行下一个")
                     continue
 
                 # ５.提交订单
@@ -85,7 +85,7 @@ class PaySV(BaseSV):
                         bill_dao.insert(order_no, user, money, state, sign, time_str)
 
             # 翻页计算
-            if page_count - 1 - page > 0:
+            if self.page_count - 1 - page > 0:
                 income_0 = income_list[0]
                 income_last = income_list[income_list.__len__() - 1]
                 x1_y1 = income_0["click_x_y"]
