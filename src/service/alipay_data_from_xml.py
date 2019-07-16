@@ -22,32 +22,32 @@ class AlipayXmlData:
         获取通知栏信息
         """
         os.system("rm -f " + self.abs_alipay_notify_path)
-        os.system("adb shell uiautomator dump /sdcard/notify.xml")
-        os.system("adb pull /sdcard/notify.xml " + self.abs_alipay_notify_path)
+        os.system("adb shell uiautomator dump  " + XMLPath.Sdcard_ABS_ALIPAY_NOTIFY_PATH.value)
+        os.system("adb pull  " + XMLPath.Sdcard_ABS_ALIPAY_NOTIFY_PATH.value + "  " + self.abs_alipay_notify_path)
 
     def __dump_alipay_app_xml(self):
         """
         获取支付宝在桌面的数据文件
         """
         os.system("rm -f " + self.abs_alipay_app_path)
-        os.system("adb shell uiautomator dump /sdcard/alipay_app.xml")
-        os.system("adb pull /sdcard/alipay_app.xml " + self.abs_alipay_app_path)
+        os.system("adb shell uiautomator dump  " + XMLPath.Sdcard_ABS_ALIPAY_APP_PATH.value)
+        os.system("adb pull " + XMLPath.Sdcard_ABS_ALIPAY_APP_PATH.value + "  " + self.abs_alipay_app_path)
 
     def __dump_x_page_xml(self):
         """
         生成判断账单的点击坐标页面
         """
         os.system("rm -f " + self.abs_x_path)
-        os.system("adb shell uiautomator dump /sdcard/x.xml")
-        os.system("adb pull /sdcard/x.xml " + self.abs_x_path)
+        os.system("adb shell uiautomator dump  " + XMLPath.Sdcard_ABS_X_PATH.value)
+        os.system("adb pull " + XMLPath.Sdcard_ABS_X_PATH.value + "  " + self.abs_x_path)
 
     def __dump_bill_page_xml(self):
         """
         生成bill　list　页面
         """
         os.system("rm -f " + self.abs_bill_path)
-        os.system("adb shell uiautomator dump /sdcard/bill_list_page.xml")
-        os.system("adb pull /sdcard/bill_list_page.xml " + self.abs_bill_path)
+        os.system("adb shell uiautomator dump  " + XMLPath.Sdcard_ABS_BILL_PATH.value)
+        os.system("adb pull  " + XMLPath.Sdcard_ABS_BILL_PATH.value + "  " + self.abs_bill_path)
 
     def __dump_personal_page_xml(self):
         """
@@ -55,24 +55,24 @@ class AlipayXmlData:
         :return:
         """
         os.system("rm -f " + self.abs_personal_path)
-        os.system("adb shell uiautomator dump /sdcard/personal_page.xml")
-        os.system("adb pull /sdcard/personal_page.xml " + self.abs_personal_path)
+        os.system("adb shell uiautomator dump  " + XMLPath.Sdcard_ABS_PERSONAL_PATH.value)
+        os.system("adb pull  " + XMLPath.Sdcard_ABS_PERSONAL_PATH.value + "  " + self.abs_personal_path)
 
     def __dump_my_page_xml(self):
         """
         导出我的页ui xml
         """
         os.system("rm -f " + self.abs_my_path)
-        os.system("adb shell uiautomator dump /sdcard/my_page.xml")
-        os.system("adb pull /sdcard/my_page.xml " + self.abs_my_path)
+        os.system("adb shell uiautomator dump  " + XMLPath.Sdcard_ABS_MY_PATH.value)
+        os.system("adb pull  " + XMLPath.Sdcard_ABS_MY_PATH.value + "  " + self.abs_my_path)
 
     def __dump_bill_coordinate_page_xml(self):
         """
         导出我的页面并仅提供给提取 账单的坐标提取使用 xml
         """
         os.system("rm -f " + self.abs_bill_coordinate_path)
-        os.system("adb shell uiautomator dump /sdcard/bill_coordinate_page.xml")
-        os.system("adb pull /sdcard/bill_coordinate_page.xml " + self.abs_bill_coordinate_path)
+        os.system("adb shell uiautomator dump  " + XMLPath.Sdcard_ABS_BILL_COORDINATE_PATH.value)
+        os.system("adb pull  " + XMLPath.Sdcard_ABS_BILL_COORDINATE_PATH.value + "  " + self.abs_bill_coordinate_path)
 
     def __dump_detail_xml(self):
         """
@@ -83,9 +83,9 @@ class AlipayXmlData:
         # 清理数据
         os.system("rm -f " + self.abs_detail_path)
         # 1.导出detail页面的xml数据，必须保障当前屏幕停留在详情页
-        os.system("adb shell uiautomator dump /sdcard/bill_detail.xml")
+        os.system("adb shell uiautomator dump  " + XMLPath.Sdcard_ABS_DETAIL_PATH.value)
         # 2.下载xml到本地
-        os.system("adb pull /sdcard/bill_detail.xml " + self.abs_detail_path)
+        os.system("adb pull  " + XMLPath.Sdcard_ABS_DETAIL_PATH.value + "  " + self.abs_detail_path)
 
     def find_alipay_x_y(self):
         """
