@@ -1,5 +1,9 @@
 from enum import Enum
 
+"""
+用于从手机导出xml页面文件的枚举配置
+"""
+
 
 class XMLPath(Enum):
     ALIPAY_APP = "alipay_app.xml"
