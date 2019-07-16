@@ -34,11 +34,15 @@ class PaySV(BaseSV):
         self.alipay.entry_bill_list_page()
 
         # ２.读取订单列表
+        count_repeat = 0
         for page in range(self.page_count):
             income_list = self.alipay.income_list()
             if income_list.__len__() <= 0:
                 continue
             for income in income_list:
+                if count_repeat == 2:
+                    return
+
                 # ３.读取订单详情
                 chick_x_y = income["click_x_y"]
                 data = self.alipay.order_detail(chick_x_y[0], chick_x_y[1])
@@ -50,6 +54,7 @@ class PaySV(BaseSV):
                 bill_record = bill_dao.load(order_no)
                 if bill_record:
                     print("重复单跳过，进行下一个")
+                    count_repeat += 1
                     continue
 
                 # ５.提交订单

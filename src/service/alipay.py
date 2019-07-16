@@ -86,10 +86,8 @@ class AliPay:
         检测是否有alipay的通知，无论什么通知均返回有通知结果
         :return:  True/False
         """
-        self.back_to_desktop()
-        time.sleep(.1)
         self.open_notify_pannel()
-        time.sleep(.1)
+        time.sleep(.5)
         notify_count = self.alipayxmldata.notify_list()
         if notify_count > 0:
             # 清理通知
