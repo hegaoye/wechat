@@ -66,7 +66,7 @@ class AliPay:
         下拉刷新页面
         """
         os.system("adb shell input swipe 900 600 900 2300 " + str(ms))
-        time.sleep(.2)
+        time.sleep(.5)
 
     def scroll_down(self, ms=300):
         """
