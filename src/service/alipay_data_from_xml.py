@@ -223,6 +223,24 @@ class AlipayXmlData:
         else:
             return False
 
+    def is_bill_list_page(self):
+        """
+        判断当前支付宝所在页面是否是 "账单" 页面
+        :return:True/False
+        """
+        self.__dump_bill_page_xml()
+        count_bill = 0
+        result_list = load_xml(self.abs_bill_path)
+        for result in result_list:
+            node = Node().to_obj(result)
+            if node.text.__eq__("账单"):
+                count_bill += 1
+
+        if count_bill >= 2:
+            return True
+        else:
+            return False
+
     def get_bill_click_x_y(self):
         """
         获取 账单的点击坐标 x y

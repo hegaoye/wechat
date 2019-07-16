@@ -30,7 +30,6 @@ class PaySV(BaseSV):
         # １.进入账单页面
         self.alipay.back_to_desktop()
         self.alipay.open_alipay_app()
-        self.alipay.jump_to_my_page()
         self.alipay.entry_bill_list_page()
 
         # ２.读取订单列表
@@ -100,6 +99,9 @@ class PaySV(BaseSV):
                 else:
                     self.alipay.scroll_down(x1_y1[0], 1080, x1_y1[0], x1_y1[1])
                 time.sleep(.5)
+
+        self.alipay.back_to_desktop()
+        time.sleep(.3)
 
     def detect_alipay_notify(self):
         """

@@ -145,16 +145,23 @@ class AliPay:
             self.jump_to_my_page()
 
     def entry_bill_list_page(self):
-        bill_x_y_setting = self.setting_dao.load(Command.Bill_x_y)
-        if bill_x_y_setting:
-            x_y = str(bill_x_y_setting["v"])
-            x_y_arr = x_y.split(",")
-            self.click(x_y_arr[0], x_y_arr[1])
+        is_bill_list_page = self.alipayxmldata.is_bill_list_page()
+        if is_bill_list_page:
+            self.refresh_bill_list(ms=300)
         else:
-            x, y = self.alipayxmldata.get_bill_click_x_y()
-            self.setting_dao.insert(Command.Bill_x_y, str(x) + "," + str(y))
-            self.click(x, y)
-        time.sleep(.5)
+            self.back()
+            is_user_center_page = self.jump_to_my_page()
+            if is_user_center_page:
+                bill_x_y_setting = self.setting_dao.load(Command.Bill_x_y)
+                if bill_x_y_setting:
+                    x_y = str(bill_x_y_setting["v"])
+                    x_y_arr = x_y.split(",")
+                    self.click(x_y_arr[0], x_y_arr[1])
+                else:
+                    x, y = self.alipayxmldata.get_bill_click_x_y()
+                    self.setting_dao.insert(Command.Bill_x_y, str(x) + "," + str(y))
+                    self.click(x, y)
+                time.sleep(.5)
 
     def income_list(self, limit=5):
         """
