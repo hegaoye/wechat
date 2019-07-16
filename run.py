@@ -27,6 +27,7 @@ class Main:
 
 
 if __name__ == '__main__':
+
     try:
         app = Main()
         # flag = app.configure()

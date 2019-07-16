@@ -1,20 +1,21 @@
 import datetime
 import os
 
+from src.base.xml_path_enum import XMLPath
 from src.service.node import Node
 from src.service.parse_xml import load_xml
 
 
 class AlipayXmlData:
     def __init__(self):
-        self.abs_alipay_app_path = "/home/scrapy_pay_client/alipay_app.xml"
-        self.abs_alipay_notify_path = "/home/scrapy_pay_client/notify.xml"
-        self.abs_detail_path = "/home/scrapy_pay_client/bill_detail.xml"
-        self.abs_my_path = "/home/scrapy_pay_client/my_page.xml"
-        self.abs_personal_path = "/home/scrapy_pay_client/personal_page.xml"
-        self.abs_x_path = "/home/scrapy_pay_client/x_page.xml"
-        self.abs_bill_coordinate_path = "/home/scrapy_pay_client/bill_coordinate_page.xml"
-        self.abs_bill_path = "/home/scrapy_pay_client/bill_list_page.xml"
+        self.abs_alipay_app_path = XMLPath.ABS_ALIPAY_APP_PATH.value
+        self.abs_alipay_notify_path = XMLPath.ABS_ALIPAY_NOTIFY_PATH.value
+        self.abs_detail_path = XMLPath.ABS_DETAIL_PATH.value
+        self.abs_my_path = XMLPath.ABS_MY_PATH.value
+        self.abs_personal_path = XMLPath.ABS_PERSONAL_PATH.value
+        self.abs_x_path = XMLPath.ABS_X_PATH.value
+        self.abs_bill_coordinate_path = XMLPath.ABS_BILL_COORDINATE_PATH.value
+        self.abs_bill_path = XMLPath.ABS_BILL_PATH.value
 
     def __dump_alipay_notify_xml(self):
         """
@@ -87,6 +88,10 @@ class AlipayXmlData:
         os.system("adb pull /sdcard/bill_detail.xml " + self.abs_detail_path)
 
     def find_alipay_x_y(self):
+        """
+        查找支付宝的 x y 的位置
+        :return: x y
+        """
         self.__dump_alipay_app_xml()
         result_list = load_xml(self.abs_alipay_app_path)
         for result in result_list:
