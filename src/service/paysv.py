@@ -15,6 +15,7 @@ class PaySV(BaseSV):
     def __init__(self):
         self.alipay = AliPay()
         self.page_count = int(self.alipay.setting_dao.load(Command.Scroll_Page_Size)["v"])
+        self.count_repeat = int(self.alipay.setting_dao.load(Command.Count_Repeat)["v"])
 
     def detect_income(self):
         """
@@ -134,7 +135,6 @@ class PaySV(BaseSV):
         }
 
         logger.debug(data)
-        print(data)
         # TODO 调试后端接口
         beanret = BeanRet()
         beanret.success = True
@@ -142,6 +142,12 @@ class PaySV(BaseSV):
         # beanret = post(self.configure_Url, data)
 
         if beanret.success:
+            # 设置屏幕分辨率
+            x_y = self.alipay.screen_resolution()
+            setting_dao.insert(Command.Screen_x_y, x_y)
+            # 设置最大重复数多少时跳出
+            setting_dao.insert(Command.Count_Repeat, 3)
+
             setting = setting_dao.load(Command.Sys)
             account_dao = AccountDao()
             token = str(beanret.data)
@@ -150,6 +156,7 @@ class PaySV(BaseSV):
                 account_dao.insert(account, appkey, token)
             else:
                 account_dao.update(account, token)
+
             return True
         else:
             return False

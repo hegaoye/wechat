@@ -40,6 +40,18 @@ class AliPay:
         os.system('adb shell input swipe ' + x1 + ' ' + y1 + ' ' + x2 + ' ' + y2)
         time.sleep(.2)
 
+    def screen_resolution(self):
+        """
+        获取屏幕的分辨率
+        :return:
+        """
+        list = os.popen("adb shell wm size")
+        for i in list:
+            screen_str = str(i).replace("\n", "")
+            if screen_str.find("Override size") >= 0:
+                screen_str = screen_str.replace("Override size: ", "").replace("x", ",")
+                return screen_str
+
     def back(self):
         """
         返回一步
