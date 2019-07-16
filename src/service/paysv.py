@@ -40,7 +40,7 @@ class PaySV(BaseSV):
                 continue
             for income in income_list:
                 if count_repeat == 2:
-                    return
+                    break
 
                 # ３.读取订单详情
                 chick_x_y = income["click_x_y"]
@@ -60,13 +60,13 @@ class PaySV(BaseSV):
                 setting_dao = SettingDao()
                 appkey_setting = setting_dao.load(Command.Appkey)
                 if not appkey_setting:
-                    return
+                    break
                 appkey = appkey_setting["v"]
 
                 account_dao = AccountDao()
                 account_user = account_dao.load(appkey)
                 if not account_user:
-                    return
+                    break
 
                 user = data["user"]
                 money = data["money"]
