@@ -88,6 +88,7 @@ class PaySV(BaseSV):
                     bill_obj = bill_dao.load(order_no)
                     if not bill_obj:
                         bill_dao.insert(order_no, user, money, state, sign, time_str)
+                        print("新增一单: " + user)
 
             # 翻页计算
             if self.page_count - 1 - page > 0:
