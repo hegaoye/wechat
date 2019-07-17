@@ -98,14 +98,7 @@ class AlipayXmlData:
         for result in result_list:
             node = Node().to_obj(result)
             if node.text.find("支付宝") >= 0:
-                data = node.bounds
-                data = str(data).replace('][', '|').replace('[', '').replace(']', '')
-                datas = data.split("|")
-                arr1 = str(datas[0]).split(",")
-                arr2 = str(datas[1]).split(",")
-                x = int(arr1[0]) + (int(arr2[0]) - int(arr1[0])) / 2
-                y = int(arr1[1]) + (int(arr2[1]) - int(arr1[1])) / 2
-                return x, y
+                return node.get_bounds()
 
     def notify_list(self):
         """
@@ -113,20 +106,19 @@ class AlipayXmlData:
         :return: 通知总数
         """
         self.__dump_alipay_notify_xml()
-        result_list = load_xml(self.abs_alipay_notify_path)
-        count = 0
+        result_list = list_attr_value(self.abs_alipay_notify_path, "resource-id",
+                                      "com.android.systemui:id/notification_title")
         if result_list.__len__() > 0:
-            for result in result_list:
-                if Node().to_obj(result).text.__eq__("支付宝通知"):
-                    count += 1
-        return count
+            return True
+        else:
+            return False
 
     def get_click_clear_notify_x_y(self):
         """
         找到清理通知的坐标
         :return: x,y
         """
-        result_list = list_attr_value(self.abs_alipay_notify_path, "resource-id", "delete")
+        result_list = list_attr_value(self.abs_alipay_notify_path, "resource-id", "com.android.systemui:id/delete")
         if result_list.__len__() > 0:
             return Node().to_obj(result_list[0]).get_bounds()
 
@@ -146,21 +138,41 @@ class AlipayXmlData:
         }
         return data
 
+    # def get_alipay_account(self):
+    #     """
+    #     获取支付宝账户信息
+    #     :return: 支付宝账户
+    #     """
+    #     if self.is_personal_apge():
+    #         result_list = load_xml(self.abs_personal_path)
+    #         for result in result_list:
+    #             node = Node().to_obj(result)
+    #             if node.text.__eq__("支付宝账号"):
+    #                 index = result_list.index(result)
+    #                 alipay_account = Node().to_obj(result_list[index + 1]).text
+    #                 return alipay_account
+    #     else:
+    #         return None
+
+    def get_click_user_center_x_y(self):
+        """
+        找到用户中心的坐标
+        :return: x,y
+        """
+        result_list = list_attr_value(self.abs_x_path, "resource-id",
+                                      "com.alipay.android.phone.wealth.home:id/tab_description")
+        if result_list.__len__() > 0:
+            return Node().to_obj(result_list[0]).get_bounds()
+
     def get_alipay_account(self):
         """
-        获取支付宝账户信息
-        :return: 支付宝账户
+        找到用户账户账户
+        :return: 账户
         """
-        if self.is_personal_apge():
-            result_list = load_xml(self.abs_personal_path)
-            for result in result_list:
-                node = Node().to_obj(result)
-                if node.text.__eq__("支付宝账号"):
-                    index = result_list.index(result)
-                    alipay_account = Node().to_obj(result_list[index + 1]).text
-                    return alipay_account
-        else:
-            return None
+        result_list = list_attr_value(self.abs_x_path, "resource-id",
+                                      "com.alipay.android.phone.wealth.home:id/user_account")
+        if result_list.__len__() > 0:
+            return Node().to_obj(result_list[0]).text
 
     def find_page_keywords(self, keyworkds, frequency=1):
         """

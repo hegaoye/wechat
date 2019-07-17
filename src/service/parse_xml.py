@@ -1,5 +1,6 @@
 # coding=utf-8
 # 全局唯一标识
+import os
 import xml.etree.ElementTree as ET
 
 from src.base.log4py import logger
@@ -99,7 +100,7 @@ def load_xml(abs_path, attr="text"):
 
 
 if __name__ == '__main__':
-    abs_path = '/home/scrapy_pay_client/notify.xml'
+    abs_path = '/home/scrapy_pay_client/my.xml'
     result_list = load_xml(abs_path)
 
     node = Node()
@@ -110,6 +111,12 @@ if __name__ == '__main__':
             print(node.get_bounds()[0])
             print(node.get_bounds()[1])
 
-    list_attr = list_attr_value(abs_path, "resource-id", "delete")
+    list_attr = list_attr_value(abs_path, "resource-id", "com.alipay.android.phone.wealth.home:id/tab_description")
     for attr in list_attr:
         print(attr)
+    # list = os.popen("adb devices")
+    # for i in list:
+    #     screen_str = str(i).replace("\n", "")
+    #     if screen_str.find("device") >= 0:
+    #         screen_str = screen_str.replace("Override size: ", "").replace("x", ",")
+    #         print(screen_str)
