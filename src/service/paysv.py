@@ -113,6 +113,10 @@ class PaySV:
         self.alipay.back_to_desktop()
         time.sleep(.3)
 
+    def detect_connect(self):
+        logger.debug("设备链接检测")
+        return self.alipay.detect_connect()
+
     def detect_alipay_notify(self):
         """
         监听支付宝的通知信息

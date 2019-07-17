@@ -17,6 +17,15 @@ class AlipayXmlData:
         self.abs_x_path = XMLPath.ABS_X_PATH.value
         self.abs_bill_coordinate_path = XMLPath.ABS_BILL_COORDINATE_PATH.value
         self.abs_bill_path = XMLPath.ABS_BILL_PATH.value
+        self.abs_connect_path = XMLPath.ABS_CONNECT_PATH.value
+
+    def __dump_connect_xml(self):
+        """
+        是否连接成功设备
+        """
+        os.system("rm -f " + self.abs_connect_path)
+        os.system("adb shell uiautomator dump  " + XMLPath.Sdcard_ABS_CONNECT_PATH.value)
+        os.system("adb pull  " + XMLPath.Sdcard_ABS_CONNECT_PATH.value + "  " + self.abs_connect_path)
 
     def __dump_alipay_notify_xml(self):
         """
@@ -99,6 +108,21 @@ class AlipayXmlData:
             node = Node().to_obj(result)
             if node.text.find("支付宝") >= 0:
                 return node.get_bounds()
+
+    def detect_connect(self):
+        """
+        检测设备连接是否成功
+        :return: 通知总数
+        """
+        self.__dump_connect_xml()
+        result_list = load_xml(self.abs_connect_path)
+        if result_list.__len__() > 0:
+            for result in result_list:
+                if str(Node().to_obj(result).text).find("充电") > 0:
+                    x, y = Node().to_obj(result).get_bounds()
+                    return True, x, y
+        else:
+            return False, 0, 0
 
     def notify_list(self):
         """

@@ -82,6 +82,19 @@ class AliPay:
         os.system("adb shell input swipe  " + str(x1) + " " + str(y1) + " " + str(x2) + " " + str(y2))
         time.sleep(.2)
 
+    def detect_connect(self):
+        """
+        检测设备连接是否成功
+        :return:  True/False
+        """
+        is_connected, x, y = self.alipayxmldata.detect_connect()
+        if is_connected:
+            self.click(x, y)
+            time.sleep(.2)
+            return True
+        else:
+            return False
+
     def detect_alilpay_notify(self):
         """
         检测是否有alipay的通知，无论什么通知均返回有通知结果

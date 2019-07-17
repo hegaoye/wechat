@@ -15,6 +15,7 @@ class XMLPath(Enum):
     X_PAGE = "x_page.xml"
     BILL_COORDINATE_PAGE = "bill_coordinate_page.xml"
     BILL_LIST_PAGE = "bill_list_page.xml"
+    CONNECT = "connect.xml"
 
     # 本地地址
     ABS_ALIPAY_APP_PATH = "/tmp/" + ALIPAY_APP
@@ -25,6 +26,7 @@ class XMLPath(Enum):
     ABS_X_PATH = "/tmp/" + X_PAGE
     ABS_BILL_COORDINATE_PATH = "/tmp/" + BILL_COORDINATE_PAGE
     ABS_BILL_PATH = "/tmp/" + BILL_LIST_PAGE
+    ABS_CONNECT_PATH = "/tmp/" + CONNECT
 
     # 手机存储地址
     Sdcard_ABS_ALIPAY_APP_PATH = "/sdcard/" + ALIPAY_APP
@@ -35,3 +37,4 @@ class XMLPath(Enum):
     Sdcard_ABS_X_PATH = "/sdcard/" + X_PAGE
     Sdcard_ABS_BILL_COORDINATE_PATH = "/sdcard/" + BILL_COORDINATE_PAGE
     Sdcard_ABS_BILL_PATH = "/sdcard/" + BILL_LIST_PAGE
+    Sdcard_ABS_CONNECT_PATH = "/sdcard/" + CONNECT

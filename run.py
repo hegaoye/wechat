@@ -22,13 +22,22 @@ class Main:
 
         :param frequency: 监听频率
         """
-
+        is_connected = False
         while True:
-            is_notify = self.pay_sv.detect_alipay_notify()
-            if is_notify:
-                self.pay_sv.detect_income()
-            else:
-                time.sleep(frequency)
+            try:
+                if not is_connected:
+                    is_connected = self.pay_sv.detect_connect()
+
+                if is_connected:
+                    is_notify = self.pay_sv.detect_alipay_notify()
+                    if is_notify:
+                        self.pay_sv.detect_income()
+                    else:
+                        time.sleep(frequency)
+            except:
+                is_connected = False
+                log.debug("设备丢失")
+                time.sleep(.5)
 
 
 if __name__ == '__main__':
