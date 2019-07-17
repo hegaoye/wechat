@@ -1,14 +1,8 @@
 # coding=utf-8
 # 全局唯一标识
-import sys
 import xml.etree.ElementTree as ET
-from imp import reload
 
 from src.service.node import Node
-
-# 设置xml为utf8 否则报错无法解析
-reload(sys)
-sys.setdefaultencoding('utf-8')
 
 unique_id = 1
 
@@ -89,8 +83,8 @@ def load_xml(abs_path, attr="text"):
     :param file_name: 文件绝对位置
     :return: list
     """
-    utf8_parser = ET.XMLParser(encoding='utf-8')
     result_list = []
+    utf8_parser = ET.XMLParser(encoding='utf-8')
     root = ET.parse(abs_path, parser=utf8_parser).getroot()
     get_data(root, result_list, attr)
     return result_list
