@@ -8,10 +8,9 @@ from src.dao.account_dao import AccountDao
 from src.dao.bill_dao import BillDao
 from src.dao.setting_dao import SettingDao
 from src.service.alipay import AliPay
-from src.service.basesv import BaseSV
 
 
-class PaySV(BaseSV):
+class PaySV:
     def __init__(self):
         self.alipay = AliPay()
         self.page_count = int(self.alipay.setting_dao.load(Command.Scroll_Page_Size)["v"])
@@ -84,7 +83,11 @@ class PaySV(BaseSV):
                 # TODO 调试后端接口
                 beanret = BeanRet()
                 beanret.success = True
-                # beanret = post(self.new_record_Url, data)
+                new_record_Url = self.alipay.setting_dao.load(Command.New_Record_Url)
+                if not new_record_Url:
+                    return
+
+                # beanret = post(new_record_Url, data)
                 if beanret.success:
                     # ６.缓存结果
                     bill_obj = bill_dao.load(order_no)
@@ -125,16 +128,15 @@ class PaySV(BaseSV):
         account = self.alipay.get_alipay_account()
         if not account:
             return
-        setting_dao = SettingDao()
-        appkey_setting = setting_dao.load(Command.Appkey)
+        appkey_setting = self.alipay.setting_dao.load(Command.Appkey)
         if not appkey_setting:
             return
         appkey = appkey_setting["v"]
 
         data = {
             "account": account,
-            "password": appkey,
-            "sign": md5("account=" + account + "&password=" + appkey + "&appkey=" + appkey)
+            "appkey": appkey,
+            "sign": md5("account=" + account + "&appkey=" + appkey + "&appkey=" + appkey)
         }
 
         logger.debug(data)
@@ -142,20 +144,24 @@ class PaySV(BaseSV):
         beanret = BeanRet()
         beanret.success = True
         beanret.data = "you_are_logined"
-        # beanret = post(self.configure_Url, data)
+        login_url = self.alipay.setting_dao.load(Command.Login_Url)
+        if not login_url:
+            return
+
+        # beanret = post(login_url, data)
 
         if beanret.success:
             # 设置屏幕分辨率
             x_y = self.alipay.screen_resolution()
-            setting_dao.insert(Command.Screen_x_y, x_y)
+            self.alipay.setting_dao.insert(Command.Screen_x_y, x_y)
             # 设置最大重复数多少时跳出
-            setting_dao.insert(Command.Count_Repeat, 3)
+            self.alipay.setting_dao.insert(Command.Count_Repeat, 3)
 
-            setting = setting_dao.load(Command.Sys)
+            setting = self.alipay.setting_dao.load(Command.Sys)
             account_dao = AccountDao()
             token = str(beanret.data)
             if str(setting["v"]).__eq__(Command.Sys_Init.value):
-                setting_dao.update(Command.Sys, Command.Sys_Login.value)
+                self.alipay.setting_dao.update(Command.Sys, Command.Sys_Login.value)
                 account_dao.insert(account, appkey, token)
             else:
                 account_dao.update(account, token)

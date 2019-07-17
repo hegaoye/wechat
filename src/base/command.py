@@ -18,3 +18,5 @@ class Command(Enum):
     Scroll_Page_Size = "Scroll_Page_Size"
     Screen_x_y = "Screen_x_y"
     Count_Repeat = "Count_Repeat"
+    Login_Url = "Login_Url"
+    New_Record_Url = "New_Record_Url"
