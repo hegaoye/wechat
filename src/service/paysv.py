@@ -75,7 +75,7 @@ class PaySV:
 
                 # md5(money=&orderNo=&state=&time=&user=&appkey=)
                 text = "money =" + str(money) + "&orderNo=" + str(order_no) + "&state=" + str(state) + \
-                       "&time=" + str(time_str) + "&user=" + str(user) + "&appkey=" + appkey
+                       "&time=" + str(time_str) + "&user=" + str(user) + appkey
 
                 sign = md5(text)
                 data["sign"] = sign
