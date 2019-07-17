@@ -92,9 +92,9 @@ class AliPay:
         time.sleep(.5)
         notify_count = self.alipayxmldata.notify_list()
         if notify_count > 0:
-            # 清理通知
-            x, y = self.alipayxmldata.get_click_clear_notify_x_y()
-            self.click(x, y)
+            # todo 测试注释 清理通知
+            # x, y = self.alipayxmldata.get_click_clear_notify_x_y()
+            # self.click(x, y)
             self.back_to_desktop()
             time.sleep(.1)
             return True
@@ -158,9 +158,10 @@ class AliPay:
         if is_bill_list_page:
             self.refresh_bill_list(ms=300)
         else:
-            self.back()
+
             is_user_center_page = self.jump_to_my_page()
             if is_user_center_page:
+                # todo 如果存在换机器了将是个bug
                 bill_x_y_setting = self.setting_dao.load(Command.Bill_x_y)
                 if bill_x_y_setting:
                     x_y = str(bill_x_y_setting["v"])
@@ -171,6 +172,8 @@ class AliPay:
                     self.setting_dao.insert(Command.Bill_x_y, str(x) + "," + str(y))
                     self.click(x, y)
                 time.sleep(.5)
+            else:
+                self.back()
 
     def income_list(self, limit=5):
         """

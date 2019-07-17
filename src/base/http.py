@@ -1,3 +1,4 @@
+# coding=utf-8
 from urllib import request, parse
 
 from src.base.beanret import BeanRet
