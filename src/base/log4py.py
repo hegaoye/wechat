@@ -4,7 +4,7 @@ import logging
 
 logger = logging.getLogger()
 
-logfile = 'diglett.log'
+logfile = 'app.log'
 fh = logging.FileHandler(logfile)
 fh.setLevel(logging.DEBUG)
 

@@ -1,7 +1,7 @@
 # coding=utf-8
+import logging.config
 import time
 
-from src.base.log4py import logger
 from src.service.paysv import PaySV
 
 
@@ -32,7 +32,9 @@ class Main:
 if __name__ == '__main__':
 
     try:
-        logger.debug("service start....")
+        logging.config.fileConfig('logging.conf')
+        log = logging.getLogger(__name__)
+        log.info('>>>>> Starting server <<<<<')
         app = Main()
         # flag = app.configure()
         # if flag:

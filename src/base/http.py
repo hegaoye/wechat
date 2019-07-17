@@ -8,13 +8,12 @@ from src.dao.setting_dao import SettingDao
 
 
 def get(url):
-    logger.info(url)
     setting_dao = SettingDao()
     host_setting = setting_dao.load(Command.Host)
     url = host_setting["v"] + url
+    logger.debug("请求url: " + url)
     response = request.urlopen(url)
     result = response.read().decode(encoding='utf-8')
-    logger.info(result)
     if result != None:
         beanret = BeanRet()
         beanret.to_obj(result)
@@ -28,10 +27,11 @@ def post(url, data=None):
         host_setting = setting_dao.load(Command.Host)
         url = host_setting["v"] + url
         postdata = parse.urlencode(data).encode('utf-8')
+        logger.debug("请求url: " + url)
+        logger.debug("请求参数: " + postdata)
         req = request.Request(url, data=postdata, method="POST")
         response = request.urlopen(req)
         result = response.read().decode(encoding='utf-8')
-        logger.info(result)
         beanret = BeanRet().to_obj(result)
         return beanret
     except:

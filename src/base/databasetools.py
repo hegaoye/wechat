@@ -21,6 +21,7 @@ class Sqlite3Tools:
         获得链接
         :return:
         """
+        logger.debug("获得链接:" + self.dbPath)
         return sqlite3.connect(self.dbPath)
 
     def insert(self, sql):
@@ -29,6 +30,7 @@ class Sqlite3Tools:
         :param sql:
         :return:
         """
+        logger.debug(sql)
         conn = self.getConn()
         conn.execute(sql)
         conn.commit()
@@ -40,6 +42,7 @@ class Sqlite3Tools:
         :param sql:
         :return:
         """
+        logger.debug(sql)
         conn = self.getConn()
         conn.execute(sql)
         conn.commit()
@@ -51,6 +54,7 @@ class Sqlite3Tools:
         :param sql:
         :return:
         """
+        logger.debug(sql)
         conn = self.getConn()
         conn.execute(sql)
         conn.commit()
@@ -62,9 +66,9 @@ class Sqlite3Tools:
         :param sql:
         :return:
         """
+        logger.debug(sql)
         conn = self.getConn()
         cursor = conn.cursor()
-        logger.debug(sql)
         results = cursor.execute(sql)
         obj = None
         for result in results:
@@ -78,6 +82,7 @@ class Sqlite3Tools:
         :param sql:
         :return:
         """
+        logger.debug(sql)
         conn = self.getConn()
         cursor = conn.cursor()
         results = cursor.execute(sql)

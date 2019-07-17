@@ -53,7 +53,7 @@ class PaySV:
                 bill_dao = BillDao()
                 bill_record = bill_dao.load(order_no)
                 if bill_record:
-                    print("重复单跳过，进行下一个")
+                    logger.debug("重复单跳过，进行下一个")
                     count_repeat += 1
                     continue
 
@@ -94,7 +94,7 @@ class PaySV:
                     bill_obj = bill_dao.load(order_no)
                     if not bill_obj:
                         bill_dao.insert(order_no, user, money, state, sign, time_str)
-                        print("新增一单: " + user)
+                        logger.debug("新增一单: " + user)
 
             # 翻页计算
             if self.page_count - 1 - page > 0:
@@ -116,6 +116,7 @@ class PaySV:
         监听支付宝的通知信息
         :return: True/False
         """
+        logger.debug("监听支付宝的通知信息")
         return self.alipay.detect_alilpay_notify()
 
     def configure(self):
@@ -140,7 +141,6 @@ class PaySV:
             "sign": md5("account=" + account + "&appkey=" + appkey + appkey)
         }
 
-        logger.debug(data)
         # TODO 调试后端接口
         beanret = BeanRet()
         beanret.success = True
@@ -166,7 +166,6 @@ class PaySV:
                 account_dao.insert(account, appkey, token)
             else:
                 account_dao.update(account, token)
-
             return True
         else:
             return False

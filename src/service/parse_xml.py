@@ -2,6 +2,7 @@
 # 全局唯一标识
 import xml.etree.ElementTree as ET
 
+from src.base.log4py import logger
 from src.service.node import Node
 
 unique_id = 1
@@ -15,9 +16,13 @@ def list_attr_value(abs_path, attr, value):
     :param value: 属性可能的值，用的是包含查询
     :return: list
     """
+    logger.debug("解析xml文件: " + abs_path)
+    logger.debug("获取属性: " + attr)
+    logger.debug("获取属性-值匹配: " + value)
     attr_list = []
     root = ET.parse(abs_path).getroot()
     search_data_from_xml(root, attr_list, attr, value)
+    logger.debug("解析数据: " + str(attr_list))
     return attr_list
 
 
@@ -83,10 +88,13 @@ def load_xml(abs_path, attr="text"):
     :param file_name: 文件绝对位置
     :return: list
     """
+    logger.debug("解析xml文件: " + abs_path)
+    logger.debug("获取属性: " + attr)
     result_list = []
     utf8_parser = ET.XMLParser(encoding='utf-8')
     root = ET.parse(abs_path, parser=utf8_parser).getroot()
     get_data(root, result_list, attr)
+    logger.debug("解析数据：" + str(result_list))
     return result_list
 
 
