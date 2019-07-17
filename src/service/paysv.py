@@ -73,7 +73,7 @@ class PaySV:
                 state = data["state"]
                 time_str = data["time"]
 
-                # md5(money=&orderNo=&state=&time=&user=&appkey=)
+                # md5(money=&orderNo=&state=&time=&user= [appkey])
                 text = "money =" + str(money) + "&orderNo=" + str(order_no) + "&state=" + str(state) + \
                        "&time=" + str(time_str) + "&user=" + str(user) + appkey
 
