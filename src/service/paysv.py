@@ -74,9 +74,9 @@ class PaySV(BaseSV):
                 state = data["state"]
                 time_str = data["time"]
 
-                # md5(money=&orderNo=&state=&time=&user=&+appkey)
+                # md5(money=&orderNo=&state=&time=&user=&+appkey=)
                 text = "money =" + str(money) + "&orderNo=" + str(order_no) + "&state=" + str(state) + \
-                       "&time=" + str(time_str) + "&user=" + str(user) + "&" + appkey
+                       "&time=" + str(time_str) + "&user=" + str(user) + "&appkey=" + appkey
 
                 sign = md5(text)
                 data["sign"] = sign
@@ -133,8 +133,8 @@ class PaySV(BaseSV):
 
         data = {
             "account": account,
-            "appkey": appkey,
-            "sign": md5(account + "&" + appkey + "&" + appkey)
+            "password": appkey,
+            "sign": md5("account=" + account + "&password=" + appkey + "&appkey=" + appkey)
         }
 
         logger.debug(data)
