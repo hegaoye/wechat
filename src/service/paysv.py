@@ -14,6 +14,8 @@ from src.service.alipay import AliPay
 class PaySV:
     def __init__(self):
         self.alipay = AliPay()
+        self.bill_dao = BillDao()
+        self.account_dao = AccountDao()
         self.page_count = int(self.alipay.setting_dao.load(Command.Scroll_Page_Size)["v"])
         self.count_repeat = int(self.alipay.setting_dao.load(Command.Count_Repeat)["v"])
 
@@ -50,8 +52,8 @@ class PaySV:
 
                 # ４.验证订单是否重复
                 order_no = data["orderNo"]
-                bill_dao = BillDao()
-                bill_record = bill_dao.load(order_no)
+
+                bill_record = self.bill_dao.load(order_no)
                 if bill_record:
                     logger.debug("重复单跳过，进行下一个")
                     count_repeat += 1
@@ -91,9 +93,9 @@ class PaySV:
                 # beanret = post(new_record_Url, data)
                 if beanret.success:
                     # ６.缓存结果
-                    bill_obj = bill_dao.load(order_no)
+                    bill_obj = self.bill_dao.load(order_no)
                     if not bill_obj:
-                        bill_dao.insert(order_no, user, money, state, sign, time_str)
+                        self.bill_dao.insert(order_no, user, money, state, sign, time_str)
                         logger.debug("新增一单: " + user)
 
             # 翻页计算
@@ -159,13 +161,13 @@ class PaySV:
             self.alipay.setting_dao.insert(Command.Count_Repeat, 3)
 
             setting = self.alipay.setting_dao.load(Command.Sys)
-            account_dao = AccountDao()
+
             token = str(beanret.data)
             if str(setting["v"]).__eq__(Command.Sys_Init.value):
                 self.alipay.setting_dao.update(Command.Sys, Command.Sys_Login.value)
-                account_dao.insert(account, appkey, token)
+                self.account_dao.insert(account, appkey, token)
             else:
-                account_dao.update(account, token)
+                self.account_dao.update(account, token)
             return True
         else:
             return False

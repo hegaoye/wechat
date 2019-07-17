@@ -92,9 +92,9 @@ class AliPay:
         time.sleep(.5)
         notify_count = self.alipayxmldata.notify_list()
         if notify_count > 0:
-            # todo 测试注释 清理通知
-            # x, y = self.alipayxmldata.get_click_clear_notify_x_y()
-            # self.click(x, y)
+            # 清理通知
+            x, y = self.alipayxmldata.get_click_clear_notify_x_y()
+            self.click(x, y)
             self.back_to_desktop()
             time.sleep(.1)
             return True
