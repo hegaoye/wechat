@@ -106,12 +106,13 @@ class AlipayXmlData:
         :return: 通知总数
         """
         self.__dump_alipay_notify_xml()
-        result_list = list_attr_value(self.abs_alipay_notify_path, "resource-id",
-                                      "com.android.systemui:id/notification_title")
+        result_list = load_xml(self.abs_alipay_notify_path)
+        count = 0
         if result_list.__len__() > 0:
-            return True
-        else:
-            return False
+            for result in result_list:
+                if Node().to_obj(result).text.__eq__("支付宝通知"):
+                    count += 1
+        return count
 
     def get_click_clear_notify_x_y(self):
         """
@@ -193,6 +194,21 @@ class AlipayXmlData:
             return True
         else:
             return False
+
+    def find_my_page(self):
+        """
+        :param keyworkds: 关键词，一般为页面独一为二的关键词
+        :param frequency: 出现在特殊页面的频次
+        :return: True/False
+        """
+        self.__dump_x_page_xml()
+        result_list = list_attr_value(self.abs_x_path, "resource-id",
+                                      "com.alipay.android.phone.wealth.home:id/tab_description")
+        if result_list.__len__() > 0:
+            x, y = Node().to_obj(result_list[0]).get_bounds()
+            return True, x, y
+        else:
+            return False, 0, 0
 
     def is_personal_apge(self):
         """

@@ -89,8 +89,8 @@ class AliPay:
         """
         self.open_notify_pannel()
         time.sleep(.5)
-        is_notify = self.alipayxmldata.notify_list()
-        if is_notify:
+        notify_count = self.alipayxmldata.notify_list()
+        if notify_count > 0:
             # 清理通知
             # x, y = self.alipayxmldata.get_click_clear_notify_x_y()
             # self.click(x, y)
@@ -132,19 +132,17 @@ class AliPay:
         进入我的页面
         :return: True/False
         """
-        is_user_center_page = self.alipayxmldata.find_page_keywords("我的", 1)
-        if is_user_center_page:
+        is_find_my_x_y, x, y = self.alipayxmldata.find_my_page()
+        # is_user_center_page = self.alipayxmldata.find_page_keywords("我的", 1)
+        if is_find_my_x_y:
             # 点击我的菜单页进入我的页面
-            x, y = self.alipayxmldata.get_click_user_center_x_y()
+            # x, y = self.alipayxmldata.get_click_user_center_x_y()
             self.click(x, y)
             time.sleep(.5)
-            if self.alipayxmldata.is_user_center_page():
-                return True
-            else:
-                return False
+            return True
         else:
             self.back()
-            self.jump_to_my_page()
+            return self.jump_to_my_page()
 
     def entry_bill_list_page(self):
         """
