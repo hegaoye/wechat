@@ -1,47 +1,38 @@
 # coding=utf-8
 import logging.config
-import time
 
+from src.base.file_tool import FileTool
 from src.service.paysv import PaySV
+from src.service.process import Process
 
 
 class Main:
     def __init__(self):
-        self.pay_sv = PaySV()
+        self.pay_sv = PaySV(None)
+        self.file_tool = FileTool()
 
-    def configure(self):
-        """
-        上线并获取基本信息给到服务器端
-        :return:
-        """
-        return self.pay_sv.configure()
+    def device_list(self):
+        return self.pay_sv.device_list()
 
     def run(self, frequency=3):
-        """
-        开启监听支付结果
+        list = self.device_list()
+        if list:
+            # 创建不同的临时目录
+            for device_id in list:
+                self.file_tool.create_folder("/tmp/" + str(device_id))
 
-        :param frequency: 监听频率
-        """
-        is_connected = False
-        while True:
-            try:
-                if not is_connected:
-                    is_connected = self.pay_sv.detect_connect()
-
-                if is_connected:
-                    is_notify = self.pay_sv.detect_alipay_notify()
-                    if is_notify:
-                        self.pay_sv.detect_income()
-                    else:
-                        time.sleep(frequency)
-            except:
-                is_connected = False
-                log.debug("设备丢失")
-                time.sleep(.5)
+            for device_id in list:
+                process_thread = None
+                try:
+                    process_thread = Process(str(device_id), frequency)
+                    process_thread.start()
+                except:
+                    log.debug("异常退出设备 : " + str(device_id))
+                    if process_thread:
+                        process_thread.stop()
 
 
 if __name__ == '__main__':
-
     try:
         logging.config.fileConfig('logging.conf')
         log = logging.getLogger(__name__)

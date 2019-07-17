@@ -7,9 +7,25 @@ from src.service.alipay_data_from_xml import AlipayXmlData
 
 
 class AliPay:
-    def __init__(self):
+    def __init__(self, device_id):
+        self.device_id = str(device_id)
         self.setting_dao = SettingDao()
         self.alipayxmldata = AlipayXmlData()
+
+    def detect_all_devices(self):
+        """
+        获取所有的设备列表
+        :return:
+        """
+        device_list = os.popen("adb devices")
+        _list = list()
+        for device in device_list:
+            device_id = str(device)
+            if device_id.find("device\n") >= 0:
+                device_id = device_id.replace("\n", "").replace("device", "").strip()
+                _list.append(device_id)
+
+        return _list
 
     def click(self, x, y):
         """
@@ -20,7 +36,7 @@ class AliPay:
         """
         x1 = str(x)
         y1 = str(y)
-        os.system('adb shell input tap ' + x1 + ' ' + y1)
+        os.system('adb -s ' + self.device_id + ' shell input tap ' + x1 + ' ' + y1)
         time.sleep(.2)
 
     def swipe(self, x1, y1, x2, y2):
@@ -31,7 +47,7 @@ class AliPay:
         y1 = str(y1)
         x2 = str(x2)
         y2 = str(y2)
-        os.system('adb shell input swipe ' + x1 + ' ' + y1 + ' ' + x2 + ' ' + y2)
+        os.system('adb -s ' + self.device_id + ' shell input swipe ' + x1 + ' ' + y1 + ' ' + x2 + ' ' + y2)
         time.sleep(.2)
 
     def screen_resolution(self):
@@ -39,7 +55,7 @@ class AliPay:
         获取屏幕的分辨率
         :return:
         """
-        list = os.popen("adb shell wm size")
+        list = os.popen("adb -s " + self.device_id + " shell wm size")
         for i in list:
             screen_str = str(i).replace("\n", "")
             if screen_str.find("Override size") >= 0:
@@ -50,28 +66,28 @@ class AliPay:
         """
         返回一步
         """
-        os.system("adb shell input keyevent 4")
+        os.system("adb -s " + self.device_id + " shell input keyevent 4")
         time.sleep(.5)
 
     def back_to_desktop(self):
         """
         回到桌面
         """
-        os.system("adb shell input keyevent 3")
+        os.system("adb -s " + self.device_id + " shell input keyevent 3")
         time.sleep(.2)
 
     def open_notify_pannel(self):
         """
         打开通知栏信息
         """
-        os.system("adb shell input swipe 900 0 900 900 100")
+        os.system("adb -s " + self.device_id + " shell input swipe 900 0 900 900 100")
         time.sleep(.2)
 
     def refresh_bill_list(self, ms=500):
         """
         下拉刷新页面
         """
-        os.system("adb shell input swipe 900 600 900 2300 " + str(ms))
+        os.system("adb -s " + self.device_id + " shell input swipe 900 600 900 2300 " + str(ms))
         time.sleep(.5)
 
     def scroll_down(self, x1, y1, x2, y2):
@@ -79,15 +95,17 @@ class AliPay:
         向下滑动页面，从上向下滑动是大的坐标变小的过程，左下角为0,0的坐标，因此
         x1=x2,y1>y2 则 从y1的高度向下滑动到y2的高度位置
         """
-        os.system("adb shell input swipe  " + str(x1) + " " + str(y1) + " " + str(x2) + " " + str(y2))
+        os.system(
+            "adb -s " + self.device_id + " shell input swipe  " + str(x1) + " " + str(y1) + " " + str(x2) + " " + str(
+                y2))
         time.sleep(.2)
 
-    def detect_connect(self):
+    def detect_connect(self, device_id):
         """
         检测设备连接是否成功
         :return:  True/False
         """
-        is_connected, x, y = self.alipayxmldata.detect_connect()
+        is_connected, x, y = self.alipayxmldata.detect_connect(device_id)
         if is_connected:
             self.click(x, y)
             time.sleep(.2)
@@ -95,14 +113,14 @@ class AliPay:
         else:
             return False
 
-    def detect_alilpay_notify(self):
+    def detect_alilpay_notify(self, device_id):
         """
         检测是否有alipay的通知，无论什么通知均返回有通知结果
         :return:  True/False
         """
         self.open_notify_pannel()
         time.sleep(.5)
-        notify_count = self.alipayxmldata.notify_list()
+        notify_count = self.alipayxmldata.notify_list(device_id)
         if notify_count > 0:
             # 清理通知
             # x, y = self.alipayxmldata.get_click_clear_notify_x_y()
@@ -113,7 +131,7 @@ class AliPay:
         else:
             return False
 
-    def open_alipay_app(self):
+    def open_alipay_app(self, device_id):
         """
         在桌面上寻找alipay的位置，并打开
         """
@@ -123,18 +141,18 @@ class AliPay:
         #     x_y_arr = x_y.split(",")
         #     self.click(x_y_arr[0], x_y_arr[1])
         # else:
-        x, y = self.alipayxmldata.find_alipay_x_y()
+        x, y = self.alipayxmldata.find_alipay_x_y(device_id)
         # self.setting_dao.insert(Command.App_x_y, str(x) + "," + str(y))
         self.click(x, y)
         time.sleep(.2)
 
-    def get_alipay_account(self):
+    def get_alipay_account(self, device_id):
         """
         读取alipay account
         :return: alipay account
         """
-        if self.alipayxmldata.is_user_center_page():
-            alipay_account = self.alipayxmldata.get_alipay_account()
+        if self.alipayxmldata.is_user_center_page(device_id):
+            alipay_account = self.alipayxmldata.get_alipay_account(device_id)
             if alipay_account:
                 return alipay_account
             else:
@@ -145,7 +163,7 @@ class AliPay:
         进入我的页面
         :return: True/False
         """
-        is_find_my_x_y, x, y = self.alipayxmldata.find_my_page()
+        is_find_my_x_y, x, y = self.alipayxmldata.find_my_page(self.device_id)
         # is_user_center_page = self.alipayxmldata.find_page_keywords("我的", 1)
         if is_find_my_x_y:
             # 点击我的菜单页进入我的页面
@@ -161,7 +179,7 @@ class AliPay:
         """
         进入到账单列表页面
         """
-        is_bill_list_page = self.alipayxmldata.is_bill_list_page()
+        is_bill_list_page = self.alipayxmldata.is_bill_list_page(self.device_id)
         if is_bill_list_page:
             self.refresh_bill_list(ms=300)
         else:
@@ -174,7 +192,7 @@ class AliPay:
                 #     x_y_arr = x_y.split(",")
                 #     self.click(x_y_arr[0], x_y_arr[1])
                 # else:
-                x, y = self.alipayxmldata.get_bill_click_x_y()
+                x, y = self.alipayxmldata.get_bill_click_x_y(self.device_id)
                 # self.setting_dao.insert(Command.Bill_x_y, str(x) + "," + str(y))
                 self.click(x, y)
                 time.sleep(.5)
@@ -186,8 +204,7 @@ class AliPay:
         获取账单页面列表信息
         :return:
         """
-        income_list = self.alipayxmldata.income_list(limit)
-        print(income_list)
+        income_list = self.alipayxmldata.income_list(self.device_id, limit)
         return income_list
 
     def order_detail(self, x, y):
@@ -197,7 +214,7 @@ class AliPay:
         """
         self.click(x, y)
         time.sleep(.5)
-        return self.alipayxmldata.detail()
+        return self.alipayxmldata.detail(self.device_id)
 
 
 if __name__ == "__main__":

@@ -12,14 +12,15 @@ from src.service.alipay import AliPay
 
 
 class PaySV:
-    def __init__(self):
-        self.alipay = AliPay()
+    def __init__(self, device_id):
+        self.device_id = device_id
+        self.alipay = AliPay(device_id)
         self.bill_dao = BillDao()
         self.account_dao = AccountDao()
         self.page_count = int(self.alipay.setting_dao.load(Command.Scroll_Page_Size)["v"])
         self.count_repeat = int(self.alipay.setting_dao.load(Command.Count_Repeat)["v"])
 
-    def detect_income(self):
+    def detect_income(self, alipay_account):
         """
         监听是否有新的支付订单
         １.进入账单页面
@@ -32,7 +33,7 @@ class PaySV:
         """
         # １.进入账单页面
         self.alipay.back_to_desktop()
-        self.alipay.open_alipay_app()
+        self.alipay.open_alipay_app(self.device_id)
         self.alipay.entry_bill_list_page()
 
         # ２.读取订单列表
@@ -67,7 +68,7 @@ class PaySV:
                 appkey = appkey_setting["v"]
 
                 account_dao = AccountDao()
-                account_user = account_dao.load(appkey)
+                account_user = account_dao.load_by_account_appkey(alipay_account, appkey)
                 if not account_user:
                     break
 
@@ -115,7 +116,15 @@ class PaySV:
 
     def detect_connect(self):
         logger.debug("设备链接检测")
-        return self.alipay.detect_connect()
+        return self.alipay.detect_connect(self.device_id)
+
+    def device_list(self):
+        """
+        设备列表
+        :return: device_list
+        """
+        device_list = self.alipay.detect_all_devices()
+        return device_list
 
     def detect_alipay_notify(self):
         """
@@ -123,7 +132,7 @@ class PaySV:
         :return: True/False
         """
         logger.debug("监听支付宝的通知信息")
-        return self.alipay.detect_alilpay_notify()
+        return self.alipay.detect_alilpay_notify(self.device_id)
 
     def configure(self):
         """
@@ -131,9 +140,9 @@ class PaySV:
         :return: True/False
         """
         self.alipay.back_to_desktop()
-        self.alipay.open_alipay_app()
+        self.alipay.open_alipay_app(self.device_id)
         self.alipay.jump_to_my_page()
-        account = self.alipay.get_alipay_account()
+        account = self.alipay.get_alipay_account(self.device_id)
         if not account:
             return
         appkey_setting = self.alipay.setting_dao.load(Command.Appkey)
@@ -159,19 +168,29 @@ class PaySV:
 
         if beanret.success:
             # 设置屏幕分辨率
-            x_y = self.alipay.screen_resolution()
-            self.alipay.setting_dao.insert(Command.Screen_x_y, x_y)
+            # x_y = self.alipay.screen_resolution()
+            # self.alipay.setting_dao.insert(Command.Screen_x_y, x_y)
             # 设置最大重复数多少时跳出
-            self.alipay.setting_dao.insert(Command.Count_Repeat, 3)
+            # self.alipay.setting_dao.insert(Command.Count_Repeat, 3)
 
             setting = self.alipay.setting_dao.load(Command.Sys)
 
             token = str(beanret.data)
             if str(setting["v"]).__eq__(Command.Sys_Init.value):
                 self.alipay.setting_dao.update(Command.Sys, Command.Sys_Login.value)
-                self.account_dao.insert(account, appkey, token)
-            else:
-                self.account_dao.update(account, token)
-            return True
+                account_load = self.account_dao.load_by_account(account)
+                if account_load:
+                    self.account_dao.delete(account)
+
+                self.account_dao.insert(account, appkey, token, self.device_id)
+
+            logger.debug("初始化配置完成")
+            return True, account
         else:
-            return False
+            return False, account
+
+    def clear_login_cache(self):
+        """
+        清理登录的缓存信息，回复默认信息
+        """
+        pass

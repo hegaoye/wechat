@@ -18,15 +18,15 @@ class XMLPath(Enum):
     CONNECT = "connect.xml"
 
     # 本地地址
-    ABS_ALIPAY_APP_PATH = "/tmp/" + ALIPAY_APP
-    ABS_ALIPAY_NOTIFY_PATH = "/tmp/" + NOTIFY
-    ABS_DETAIL_PATH = "/tmp/" + BILL_DETAIL
-    ABS_MY_PATH = "/tmp/" + MY_PAGE
-    ABS_PERSONAL_PATH = "/tmp/" + PERSONAL_PAGE
-    ABS_X_PATH = "/tmp/" + X_PAGE
-    ABS_BILL_COORDINATE_PATH = "/tmp/" + BILL_COORDINATE_PAGE
-    ABS_BILL_PATH = "/tmp/" + BILL_LIST_PAGE
-    ABS_CONNECT_PATH = "/tmp/" + CONNECT
+    ABS_ALIPAY_APP_PATH = "/tmp/{device_id}/" + ALIPAY_APP
+    ABS_ALIPAY_NOTIFY_PATH = "/tmp/{device_id}/" + NOTIFY
+    ABS_DETAIL_PATH = "/tmp/{device_id}/" + BILL_DETAIL
+    ABS_MY_PATH = "/tmp/{device_id}/" + MY_PAGE
+    ABS_PERSONAL_PATH = "/tmp/{device_id}/" + PERSONAL_PAGE
+    ABS_X_PATH = "/tmp/{device_id}/" + X_PAGE
+    ABS_BILL_COORDINATE_PATH = "/tmp/{device_id}/" + BILL_COORDINATE_PAGE
+    ABS_BILL_PATH = "/tmp/{device_id}/" + BILL_LIST_PAGE
+    ABS_CONNECT_PATH = "/tmp/{device_id}/" + CONNECT
 
     # 手机存储地址
     Sdcard_ABS_ALIPAY_APP_PATH = "/sdcard/" + ALIPAY_APP

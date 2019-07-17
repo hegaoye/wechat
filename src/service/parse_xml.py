@@ -1,6 +1,5 @@
 # coding=utf-8
 # 全局唯一标识
-import os
 import xml.etree.ElementTree as ET
 
 from src.base.log4py import logger
@@ -114,9 +113,3 @@ if __name__ == '__main__':
     list_attr = list_attr_value(abs_path, "resource-id", "com.alipay.android.phone.wealth.home:id/tab_description")
     for attr in list_attr:
         print(attr)
-    # list = os.popen("adb devices")
-    # for i in list:
-    #     screen_str = str(i).replace("\n", "")
-    #     if screen_str.find("device") >= 0:
-    #         screen_str = screen_str.replace("Override size: ", "").replace("x", ",")
-    #         print(screen_str)
