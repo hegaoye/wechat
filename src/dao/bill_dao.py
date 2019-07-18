@@ -1,4 +1,6 @@
 # coding=utf-8
+import datetime
+
 from src.base.databasetools import Sqlite3Tools
 
 
@@ -15,6 +17,8 @@ class BillDao:
         sql = 'select * from bill where order_no="' + order_no + '"'
         return self.db.load(sql)
 
+
+
     def insert(self, order_no, user, money, state, md5, order_time, account):
         """
         保存订单记录
@@ -26,7 +30,8 @@ class BillDao:
         :param order_time: 交易时间
         :param account: 支付账户
         """
-        sql = 'insert into bill("order_no","account","user","money","state","md5","order_time") values ("' + str(
-            order_no) + '","' + str(account) + '","' + str(user) + '","' + str(money) + '","' + str(
-            state) + '","' + str(md5) + '","' + str(order_time) + '")'
+        sql = 'insert into bill("order_no","account","user","money","state","md5","order_time","create_time") ' \
+              ' values("' + str(order_no) + '","' + str(account) + '","' + str(user) + '","' + str(money) + '","' \
+              + str(state) + '","' + str(md5) + '","' + str(order_time) + '","' \
+              + str(datetime.datetime.now().strftime('%Y%m%d%H%M%S')) + '")'
         self.db.insert(sql)
