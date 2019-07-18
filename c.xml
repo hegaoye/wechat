@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<hierarchy rotation="0">
+    <node index="0" text="" resource-id="" class="android.widget.FrameLayout" package="com.android.settings"
+          content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false"
+          focused="false" scrollable="false" long-clickable="false" password="false" selected="false"
+          bounds="[0,951][1080,1746]">
+        <node index="0" text="" resource-id="" class="android.widget.FrameLayout" package="com.android.settings"
+              content-desc="" checkable="false" checked="false" clickable="false" enabled="true" focusable="false"
+              focused="false" scrollable="false" long-clickable="false" password="false" selected="false"
+              bounds="[0,951][1080,1746]">
+            <node index="0" text="" resource-id="android:id/content" class="android.widget.FrameLayout"
+                  package="com.android.settings" content-desc="" checkable="false" checked="false" clickable="false"
+                  enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false"
+                  password="false" selected="false" bounds="[0,951][1080,1746]">
+                <node index="0" text="" resource-id="android:id/parentPanel" class="android.widget.LinearLayout"
+                      package="com.android.settings" content-desc="" checkable="false" checked="false" clickable="false"
+                      enabled="true" focusable="false" focused="false" scrollable="false" long-clickable="false"
+                      password="false" selected="false" bounds="[0,951][1080,1746]">
+                    <node index="0" text="" resource-id="android:id/topPanel" class="android.widget.LinearLayout"
+                          package="com.android.settings" content-desc="" checkable="false" checked="false"
+                          clickable="false" enabled="true" focusable="false" focused="false" scrollable="false"
+                          long-clickable="false" password="false" selected="false" bounds="[0,951][1080,1120]">
+                        <node index="0" text="" resource-id="android:id/title_template"
+                              class="android.widget.LinearLayout" package="com.android.settings" content-desc=""
+                              checkable="false" checked="false" clickable="false" enabled="true" focusable="false"
+                              focused="false" scrollable="false" long-clickable="false" password="false"
+                              selected="false" bounds="[0,951][1080,1120]">
+                            <node index="0" text="USB 连接方式" resource-id="android:id/alertTitle"
+                                  class="android.widget.TextView" package="com.android.settings" content-desc=""
+                                  checkable="false" checked="false" clickable="false" enabled="true" focusable="false"
+                                  focused="false" scrollable="false" long-clickable="false" password="false"
+                                  selected="false" bounds="[72,999][1008,1072]"/>
+                        </node>
+                    </node>
+                    <node index="1" text="" resource-id="android:id/contentPanel" class="android.widget.FrameLayout"
+                          package="com.android.settings" content-desc="" checkable="false" checked="false"
+                          clickable="false" enabled="true" focusable="false" focused="false" scrollable="false"
+                          long-clickable="false" password="false" selected="false" bounds="[0,1120][1080,1554]">
+                        <node index="0" text="" resource-id="android:id/select_dialog_listview"
+                              class="android.widget.ListView" package="com.android.settings" content-desc=""
+                              checkable="false" checked="false" clickable="false" enabled="true" focusable="true"
+                              focused="false" scrollable="false" long-clickable="false" password="false"
+                              selected="false" bounds="[0,1120][1080,1554]">
+                            <node index="0" text="" resource-id="" class="android.widget.LinearLayout"
+                                  package="com.android.settings" content-desc="" checkable="false" checked="false"
+                                  clickable="true" enabled="true" focusable="false" focused="false" scrollable="false"
+                                  long-clickable="false" password="false" selected="false" bounds="[0,1120][1080,1264]">
+                                <node index="0" text="传输照片" resource-id="com.android.settings:id/text1"
+                                      class="android.widget.CheckedTextView" package="com.android.settings"
+                                      content-desc="" checkable="true" checked="false" clickable="false" enabled="true"
+                                      focusable="false" focused="false" scrollable="false" long-clickable="false"
+                                      password="false" selected="false" bounds="[72,1120][1050,1264]"/>
+                            </node>
+                            <node index="1" text="" resource-id="" class="android.widget.LinearLayout"
+                                  package="com.android.settings" content-desc="" checkable="false" checked="false"
+                                  clickable="true" enabled="true" focusable="false" focused="false" scrollable="false"
+                                  long-clickable="false" password="false" selected="false" bounds="[0,1265][1080,1409]">
+                                <node index="0" text="传输文件" resource-id="com.android.settings:id/text1"
+                                      class="android.widget.CheckedTextView" package="com.android.settings"
+                                      content-desc="" checkable="true" checked="false" clickable="false" enabled="true"
+                                      focusable="false" focused="false" scrollable="false" long-clickable="false"
+                                      password="false" selected="false" bounds="[72,1265][1050,1409]"/>
+                            </node>
+                            <node index="2" text="" resource-id="" class="android.widget.LinearLayout"
+                                  package="com.android.settings" content-desc="" checkable="false" checked="false"
+                                  clickable="true" enabled="true" focusable="false" focused="false" scrollable="false"
+                                  long-clickable="false" password="false" selected="false" bounds="[0,1410][1080,1554]">
+                                <node index="0" text="仅充电" resource-id="com.android.settings:id/text1"
+                                      class="android.widget.CheckedTextView" package="com.android.settings"
+                                      content-desc="" checkable="true" checked="true" clickable="false" enabled="true"
+                                      focusable="false" focused="false" scrollable="false" long-clickable="false"
+                                      password="false" selected="false" bounds="[72,1410][1050,1554]"/>
+                            </node>
+                        </node>
+                    </node>
+                    <node index="2" text="" resource-id="android:id/buttonPanel" class="android.widget.LinearLayout"
+                          package="com.android.settings" content-desc="" checkable="false" checked="false"
+                          clickable="false" enabled="true" focusable="false" focused="false" scrollable="false"
+                          long-clickable="false" password="false" selected="false" bounds="[0,1554][1080,1746]">
+                        <node index="0" text="" resource-id="" class="android.widget.LinearLayout"
+                              package="com.android.settings" content-desc="" checkable="false" checked="false"
+                              clickable="false" enabled="true" focusable="false" focused="false" scrollable="false"
+                              long-clickable="false" password="false" selected="false" bounds="[0,1590][1080,1734]">
+                            <node index="0" text="取消" resource-id="android:id/button2" class="android.widget.Button"
+                                  package="com.android.settings" content-desc="" checkable="false" checked="false"
+                                  clickable="true" enabled="true" focusable="true" focused="false" scrollable="false"
+                                  long-clickable="false" password="false" selected="false"
+                                  bounds="[12,1602][1068,1722]"/>
+                        </node>
+                    </node>
+                </node>
+            </node>
+        </node>
+    </node>
+</hierarchy>
