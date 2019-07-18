@@ -180,13 +180,23 @@ class AlipayXmlData:
         self.__dump_detail_xml(device_id)
         path = self.abs_detail_path.replace("{device_id}", device_id)
         result_list = load_xml(path)
-        data = {
-            "user": Node().to_obj(result_list[3]).text,
-            "orderNo": Node().to_obj(result_list[11]).text,
-            "money": Node().to_obj(result_list[4]).text.replace("+", ""),
-            "state": Node().to_obj(result_list[5]).text,
-            "time": Node().to_obj(result_list[9]).text
-        }
+        if result_list.__len__() < 11:
+            result_list = load_xml(path, "content-desc")
+            data = {
+                "user": Node().to_obj(result_list[3]).desc,
+                "orderNo": Node().to_obj(result_list[11]).desc,
+                "money": Node().to_obj(result_list[4]).desc.replace("+", ""),
+                "state": Node().to_obj(result_list[5]).desc,
+                "time": Node().to_obj(result_list[9]).desc
+            }
+        else:
+            data = {
+                "user": Node().to_obj(result_list[3]).text,
+                "orderNo": Node().to_obj(result_list[11]).text,
+                "money": Node().to_obj(result_list[4]).text.replace("+", ""),
+                "state": Node().to_obj(result_list[5]).text,
+                "time": Node().to_obj(result_list[9]).text
+            }
         return data
 
     def get_alipay_account(self, device_id):

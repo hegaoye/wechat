@@ -78,7 +78,7 @@ def get_data(root_node, result_list, attr):
     if len(children_node) == 0:
         return
     for child in children_node:
-        get_data(child, result_list,attr)
+        get_data(child, result_list, attr)
     return
 
 
@@ -100,7 +100,7 @@ def load_xml(abs_path, attr="text"):
 
 if __name__ == '__main__':
     abs_path = '/home/scrapy_pay_client/bill_detail.xml'
-    result_list = load_xml(abs_path)
+    result_list = load_xml(abs_path,"content-desc")
 
     node = Node()
     for x in result_list:
