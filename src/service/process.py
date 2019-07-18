@@ -6,6 +6,10 @@ from src.service.paysv import PaySV
 
 log = logging.getLogger(__name__)
 
+"""
+多线程启动不同设备
+"""
+
 
 class Process(threading.Thread):
     def __init__(self, device_id, frequency=3):
@@ -30,7 +34,7 @@ class Process(threading.Thread):
         :return:
         '''
         log.debug("running thread ! ")
-        is_connected = True
+        is_connected = False
         is_login = False
         while True:
             if self.is_stop:
@@ -38,19 +42,20 @@ class Process(threading.Thread):
                 return
 
             try:
-                # if not is_connected:
-                #     is_connected = self.detect_connect()
+                if not is_connected:
+                    is_connected = self.detect_connect()
 
                 if is_connected:
                     log.debug("connected device:" + self.device_id)
                     if not is_login:
-                        flag, alipay_account = self.configure()
+                        is_login, alipay_account = self.configure()
 
-                    is_notify = self.pay_sv.detect_alipay_notify()
-                    if is_notify:
-                        self.pay_sv.detect_income(alipay_account)
-                    else:
-                        time.sleep(self.frequency)
+                    if is_login:
+                        is_notify = self.pay_sv.detect_alipay_notify()
+                        if is_notify:
+                            self.pay_sv.detect_income(alipay_account)
+                        else:
+                            time.sleep(self.frequency)
             except:
                 is_connected = False
                 is_login = False

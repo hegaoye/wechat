@@ -38,3 +38,6 @@ class XMLPath(Enum):
     Sdcard_ABS_BILL_COORDINATE_PATH = "/sdcard/" + BILL_COORDINATE_PAGE
     Sdcard_ABS_BILL_PATH = "/sdcard/" + BILL_LIST_PAGE
     Sdcard_ABS_CONNECT_PATH = "/sdcard/" + CONNECT
+
+    # 工作空间
+    Workspace_PATH = "/tmp/"

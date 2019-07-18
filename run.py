@@ -2,6 +2,7 @@
 import logging.config
 
 from src.base.file_tool import FileTool
+from src.base.xml_path_enum import XMLPath
 from src.service.paysv import PaySV
 from src.service.process import Process
 
@@ -17,9 +18,10 @@ class Main:
     def run(self, frequency=3):
         list = self.device_list()
         if list:
-            # 创建不同的临时目录
+            # 为设备创建临时工作目录
             for device_id in list:
-                self.file_tool.create_folder("/tmp/" + str(device_id))
+                self.file_tool.remove(XMLPath.Workspace_PATH.value + str(device_id))
+                self.file_tool.create_folder(XMLPath.Workspace_PATH.value + str(device_id))
 
             for device_id in list:
                 process_thread = None
@@ -37,10 +39,6 @@ if __name__ == '__main__':
         logging.config.fileConfig('logging.conf')
         log = logging.getLogger(__name__)
         log.info('>>>>> Starting server <<<<<')
-        app = Main()
-        # flag = app.configure()
-        # if flag:
-        #     app.run()
-        app.run()
+        Main().run()
     except Exception as e:
         print(e)

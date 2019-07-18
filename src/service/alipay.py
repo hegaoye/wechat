@@ -105,10 +105,19 @@ class AliPay:
         检测设备连接是否成功
         :return:  True/False
         """
-        is_connected, x, y = self.alipayxmldata.detect_connect(device_id)
-        if is_connected:
-            self.click(x, y)
-            time.sleep(.2)
+        is_online = False
+        device_list = self.detect_all_devices()
+        for device in device_list:
+            if str(device_id).__eq__(str(device)):
+                is_online = True
+                break
+
+        if is_online:
+            is_connected, x, y = self.alipayxmldata.detect_connect(device_id)
+            if is_connected:
+                self.click(x, y)
+                time.sleep(.2)
+
             return True
         else:
             return False
