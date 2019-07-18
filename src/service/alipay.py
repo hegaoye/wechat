@@ -87,6 +87,7 @@ class AliPay:
         """
         下拉刷新页面
         """
+        # todo 修改下拉刷刷新的坐标问题
         os.system("adb -s " + self.device_id + " shell input swipe 900 600 900 2300 " + str(ms))
         time.sleep(.5)
 
@@ -192,8 +193,8 @@ class AliPay:
         if is_bill_list_page:
             self.refresh_bill_list(ms=300)
         else:
-            is_user_center_page = self.jump_to_my_page()
-            if is_user_center_page:
+            is_my_page = self.jump_to_my_page()
+            if is_my_page:
                 # todo 如果存在换机器了将是个bug
                 # bill_x_y_setting = self.setting_dao.load(Command.Bill_x_y)
                 # if bill_x_y_setting:

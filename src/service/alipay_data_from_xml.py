@@ -187,33 +187,6 @@ class AlipayXmlData:
         }
         return data
 
-    # def get_alipay_account(self):
-    #     """
-    #     获取支付宝账户信息
-    #     :return: 支付宝账户
-    #     """
-    #     if self.is_personal_apge():
-    #         result_list = load_xml(self.abs_personal_path)
-    #         for result in result_list:
-    #             node = Node().to_obj(result)
-    #             if node.text.__eq__("支付宝账号"):
-    #                 index = result_list.index(result)
-    #                 alipay_account = Node().to_obj(result_list[index + 1]).text
-    #                 return alipay_account
-    #     else:
-    #         return None
-
-    def get_click_user_center_x_y(self, device_id):
-        """
-        找到用户中心的坐标
-        :return: x,y
-        """
-        path = self.abs_x_path.replace("{device_id}", device_id)
-        result_list = list_attr_value(path, "resource-id",
-                                      "com.alipay.android.phone.wealth.home:id/tab_description")
-        if result_list.__len__() > 0:
-            return Node().to_obj(result_list[0]).get_bounds()
-
     def get_alipay_account(self, device_id):
         """
         找到用户账户账户
