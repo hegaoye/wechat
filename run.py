@@ -16,6 +16,10 @@ class Main:
         return self.pay_sv.device_list()
 
     def run(self, frequency=3):
+        """
+        系统的入口
+        :param frequency: 休眠频率 秒 为单位
+        """
         list = self.device_list()
         if list:
             # 为设备创建临时工作目录
