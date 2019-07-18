@@ -12,9 +12,9 @@ from src.service.alipay import AliPay
 
 
 class PaySV:
-    def __init__(self, device_id):
+    def __init__(self, device_id, debug=False):
         self.device_id = device_id
-        self.alipay = AliPay(device_id)
+        self.alipay = AliPay(device_id, debug)
         self.bill_dao = BillDao()
         self.account_dao = AccountDao()
         self.page_count = int(self.alipay.setting_dao.load(Command.Scroll_Page_Size)["v"])
@@ -43,7 +43,7 @@ class PaySV:
             if income_list.__len__() <= 0:
                 continue
             for income in income_list:
-                if count_repeat == 2:
+                if count_repeat == int(self.count_repeat):
                     break
 
                 # ３.读取订单详情
@@ -168,21 +168,18 @@ class PaySV:
 
         if beanret.success:
             # 设置屏幕分辨率
-            # x_y = self.alipay.screen_resolution()
-            # self.alipay.setting_dao.insert(Command.Screen_x_y, x_y)
+            screen_x_y = self.alipay.screen_resolution()
             # 设置最大重复数多少时跳出
-            # self.alipay.setting_dao.insert(Command.Count_Repeat, 3)
-
-            setting = self.alipay.setting_dao.load(Command.Sys)
+            count_Repeat_setting = self.alipay.setting_dao.load(Command.Count_Repeat)
+            if not count_Repeat_setting:
+                self.alipay.setting_dao.insert(Command.Count_Repeat, 3)
 
             token = str(beanret.data)
-            if str(setting["v"]).__eq__(Command.Sys_Init.value):
-                self.alipay.setting_dao.update(Command.Sys, Command.Sys_Login.value)
-                account_load = self.account_dao.load_by_account(account)
-                if account_load:
-                    self.account_dao.delete(account)
+            account_load = self.account_dao.load_by_account(account)
+            if account_load:
+                self.account_dao.delete(account)
 
-                self.account_dao.insert(account, appkey, token, self.device_id)
+            self.account_dao.insert(account, appkey, token, self.device_id, screen_x_y)
 
             logger.debug("初始化配置完成")
             return True, account
@@ -191,6 +188,6 @@ class PaySV:
 
     def clear_login_cache(self):
         """
-        清理登录的缓存信息，回复默认信息
+        清理登录的缓存信息，恢复默认信息
         """
-        pass
+        self.account_dao.delete(self.device_id)

@@ -6,6 +6,10 @@ from src.base.xml_path_enum import XMLPath
 from src.service.paysv import PaySV
 from src.service.process import Process
 
+"""
+入口启动文件类
+"""
+
 
 class Main:
     def __init__(self):
@@ -13,9 +17,13 @@ class Main:
         self.file_tool = FileTool()
 
     def device_list(self):
+        """
+        设备列表
+        :return: 所有设备列表
+        """
         return self.pay_sv.device_list()
 
-    def run(self, frequency=3):
+    def run(self, frequency=3, debug=False):
         """
         系统的入口
         :param frequency: 休眠频率 秒 为单位
@@ -30,7 +38,7 @@ class Main:
             for device_id in list:
                 process_thread = None
                 try:
-                    process_thread = Process(str(device_id), frequency)
+                    process_thread = Process(str(device_id), frequency, debug)
                     process_thread.start()
                 except:
                     log.debug("异常退出设备 : " + str(device_id))
@@ -43,6 +51,6 @@ if __name__ == '__main__':
         logging.config.fileConfig('logging.conf')
         log = logging.getLogger(__name__)
         log.info('>>>>> Starting server <<<<<')
-        Main().run()
+        Main().run(debug=True)
     except Exception as e:
         print(e)

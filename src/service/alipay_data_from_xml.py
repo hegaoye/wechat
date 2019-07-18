@@ -142,6 +142,8 @@ class AlipayXmlData:
                 if str(Node().to_obj(result).text).find("充电") > 0:
                     x, y = Node().to_obj(result).get_bounds()
                     return True, x, y
+
+            return False, 0, 0
         else:
             return False, 0, 0
 
@@ -156,7 +158,7 @@ class AlipayXmlData:
         count = 0
         if result_list.__len__() > 0:
             for result in result_list:
-                if str(Node().to_obj(result).text).find("支付宝"):
+                if str(Node().to_obj(result).text).find("支付宝") >= 0:
                     count += 1
         return count
 

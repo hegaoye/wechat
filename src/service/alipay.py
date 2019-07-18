@@ -2,14 +2,17 @@
 import os
 import time
 
+from src.dao.account_dao import AccountDao
 from src.dao.setting_dao import SettingDao
 from src.service.alipay_data_from_xml import AlipayXmlData
 
 
 class AliPay:
-    def __init__(self, device_id):
+    def __init__(self, device_id, debug):
         self.device_id = str(device_id)
         self.setting_dao = SettingDao()
+        self.account_dao = AccountDao()
+        self.debug = debug
         self.alipayxmldata = AlipayXmlData()
 
     def detect_all_devices(self):
@@ -133,8 +136,10 @@ class AliPay:
         notify_count = self.alipayxmldata.notify_list(device_id)
         if notify_count > 0:
             # 清理通知
-            # x, y = self.alipayxmldata.get_click_clear_notify_x_y()
-            # self.click(x, y)
+            if not self.debug:
+                x, y = self.alipayxmldata.get_click_clear_notify_x_y(self.device_id)
+                self.click(x, y)
+
             self.back_to_desktop()
             time.sleep(.1)
             return True
@@ -145,14 +150,19 @@ class AliPay:
         """
         在桌面上寻找alipay的位置，并打开
         """
-        # app_x_y_setting = self.setting_dao.load(Command.App_x_y)
-        # if app_x_y_setting:
-        #     x_y = str(app_x_y_setting["v"])
-        #     x_y_arr = x_y.split(",")
-        #     self.click(x_y_arr[0], x_y_arr[1])
-        # else:
-        x, y = self.alipayxmldata.find_alipay_x_y(device_id)
-        # self.setting_dao.insert(Command.App_x_y, str(x) + "," + str(y))
+        account = self.account_dao.load_by_device_id(device_id)
+        if account:
+            if account["app_x_y"]:
+                x_y = str(account["app_x_y"])
+                x_y_arr = x_y.split(",")
+                x = x_y_arr[0]
+                y = x_y_arr[1]
+            else:
+                x, y = self.alipayxmldata.find_alipay_x_y(device_id)
+                self.account_dao.update_app_x_y(device_id, str(x) + "," + str(y))
+        else:
+            x, y = self.alipayxmldata.find_alipay_x_y(device_id)
+
         self.click(x, y)
         time.sleep(.2)
 
@@ -167,6 +177,8 @@ class AliPay:
                 return alipay_account
             else:
                 return None
+        else:
+            return None
 
     def jump_to_my_page(self):
         """
@@ -174,10 +186,7 @@ class AliPay:
         :return: True/False
         """
         is_find_my_x_y, x, y = self.alipayxmldata.find_my_page(self.device_id)
-        # is_user_center_page = self.alipayxmldata.find_page_keywords("我的", 1)
         if is_find_my_x_y:
-            # 点击我的菜单页进入我的页面
-            # x, y = self.alipayxmldata.get_click_user_center_x_y()
             self.click(x, y)
             time.sleep(.5)
             return True
@@ -195,15 +204,18 @@ class AliPay:
         else:
             is_my_page = self.jump_to_my_page()
             if is_my_page:
-                # todo 如果存在换机器了将是个bug
-                # bill_x_y_setting = self.setting_dao.load(Command.Bill_x_y)
-                # if bill_x_y_setting:
-                #     x_y = str(bill_x_y_setting["v"])
-                #     x_y_arr = x_y.split(",")
-                #     self.click(x_y_arr[0], x_y_arr[1])
-                # else:
-                x, y = self.alipayxmldata.get_bill_click_x_y(self.device_id)
-                # self.setting_dao.insert(Command.Bill_x_y, str(x) + "," + str(y))
+                account = self.account_dao.load_by_device_id(self.device_id)
+                if account:
+                    if account["bill_x_y"]:
+                        x_y = str(account["bill_x_y"])
+                        x_y_arr = x_y.split(",")
+                        x, y = x_y_arr[0], x_y_arr[1]
+                    else:
+                        x, y = self.alipayxmldata.get_bill_click_x_y(self.device_id)
+                        self.account_dao.update_bill_x_y(self.device_id, str(x) + "," + str(y))
+                else:
+                    x, y = self.alipayxmldata.get_bill_click_x_y(self.device_id)
+
                 self.click(x, y)
                 time.sleep(.5)
             else:
@@ -225,17 +237,3 @@ class AliPay:
         self.click(x, y)
         time.sleep(.5)
         return self.alipayxmldata.detail(self.device_id)
-
-
-if __name__ == "__main__":
-    pay_ali = AliPay()
-    # pay_ali.run()
-    # pay_ali.run_xml()
-    # pay_ali.open_alipay_app()
-    # pay_ali.jump_to_my_page()
-    # print(pay_ali.income_list(limit=5, page=4))
-    # pay_ali.scroll_down()
-
-    flag = pay_ali.detect_alilpay_notify()
-    if flag:
-        pay_ali.open_alipay_app()

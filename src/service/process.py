@@ -1,10 +1,8 @@
-import logging
 import threading
 import time
 
+from src.base.log4py import logger
 from src.service.paysv import PaySV
-
-log = logging.getLogger(__name__)
 
 """
 多线程启动不同设备
@@ -12,10 +10,10 @@ log = logging.getLogger(__name__)
 
 
 class Process(threading.Thread):
-    def __init__(self, device_id, frequency=3):
+    def __init__(self, device_id, frequency=3, debug=False):
         threading.Thread.__init__(self)
         self.device_id = str(device_id)
-        self.pay_sv = PaySV(str(device_id))
+        self.pay_sv = PaySV(str(device_id), debug=debug)
         self.frequency = frequency
         self.is_stop = False
 
@@ -24,7 +22,7 @@ class Process(threading.Thread):
         stop thread
         :return:
         '''
-        log.debug("stop thread ! ")
+        logger.debug("stop thread ! ")
         self.is_stop = True
         self.join()
 
@@ -33,12 +31,12 @@ class Process(threading.Thread):
         running thread
         :return:
         '''
-        log.debug("running thread ! ")
+        logger.debug("running thread for device [" + self.device_id + "] ")
         is_connected = False
         is_login = False
         while True:
             if self.is_stop:
-                log.debug("return while")
+                logger.debug("return while")
                 return
 
             try:
@@ -46,7 +44,7 @@ class Process(threading.Thread):
                     is_connected = self.detect_connect()
 
                 if is_connected:
-                    log.debug("connected device:" + self.device_id)
+                    logger.debug("connected to device:" + self.device_id)
                     if not is_login:
                         is_login, alipay_account = self.configure()
 
@@ -60,7 +58,7 @@ class Process(threading.Thread):
                 is_connected = False
                 is_login = False
                 self.pay_sv.clear_login_cache()
-                log.debug("lost device: " + self.device_id)
+                logger.debug("lost device: " + self.device_id)
                 time.sleep(.5)
 
     def configure(self):
