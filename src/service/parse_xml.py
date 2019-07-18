@@ -53,7 +53,7 @@ def search_data_from_xml(root_node, attr_list, attr, value):
     return
 
 
-def get_data(root_node, result_list, attr="text"):
+def get_data(root_node, result_list, attr):
     """
     遍历所有的节点
     :param root_node: 入口节点
@@ -78,7 +78,7 @@ def get_data(root_node, result_list, attr="text"):
     if len(children_node) == 0:
         return
     for child in children_node:
-        get_data(child, result_list)
+        get_data(child, result_list,attr)
     return
 
 
@@ -99,7 +99,7 @@ def load_xml(abs_path, attr="text"):
 
 
 if __name__ == '__main__':
-    abs_path = '/home/scrapy_pay_client/my.xml'
+    abs_path = '/home/scrapy_pay_client/bill_detail.xml'
     result_list = load_xml(abs_path)
 
     node = Node()
