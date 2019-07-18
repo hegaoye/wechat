@@ -69,9 +69,9 @@ class AccountDao:
         :param device_id: 设备编码
         :param screen_x_y: 屏幕的x,y坐标
         """
-        sql = "insert into user('account','appkey','token','device_id','screen_x_y') " \
-              "VALUES ('" + str(account) + "','" + str(appkey) + "','" + str(token) + \
-              "','" + str(device_id) + "','" + str(screen_x_y) + "') "
+        sql = 'insert into user("account","appkey","token","device_id","screen_x_y") values ("' + str(
+            account) + '","' + str(appkey) + '","' + str(token) + '","' + str(device_id) + '","' + str(
+            screen_x_y) + '")'
         self.db.insert(sql)
 
     def delete(self, device_id):

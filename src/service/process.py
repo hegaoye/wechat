@@ -57,7 +57,7 @@ class Process(threading.Thread):
             except:
                 is_connected = False
                 is_login = False
-                self.pay_sv.clear_login_cache()
+                # self.pay_sv.clear_login_cache()
                 logger.debug("lost device: " + self.device_id)
                 time.sleep(.5)
 

@@ -177,7 +177,7 @@ class PaySV:
             token = str(beanret.data)
             account_load = self.account_dao.load_by_account(account)
             if account_load:
-                self.account_dao.delete(account)
+                self.account_dao.delete(self.device_id)
 
             self.account_dao.insert(account, appkey, token, self.device_id, screen_x_y)
 

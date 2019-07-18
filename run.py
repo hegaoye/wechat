@@ -1,5 +1,6 @@
 # coding=utf-8
 import logging.config
+import time
 
 from src.base.file_tool import FileTool
 from src.base.xml_path_enum import XMLPath
@@ -40,10 +41,13 @@ class Main:
                 try:
                     process_thread = Process(str(device_id), frequency, debug)
                     process_thread.start()
+                    time.sleep(1)
                 except:
                     log.debug("异常退出设备 : " + str(device_id))
                     if process_thread:
                         process_thread.stop()
+
+        log.debug("线程启动完毕")
 
 
 if __name__ == '__main__':
