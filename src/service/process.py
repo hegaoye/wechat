@@ -52,14 +52,12 @@ class Process(threading.Thread):
                         is_notify = self.pay_sv.detect_alipay_notify()
                         if is_notify:
                             self.pay_sv.detect_income(alipay_account)
-                        else:
-                            time.sleep(self.frequency)
             except:
                 is_connected = False
                 is_login = False
-                # self.pay_sv.clear_login_cache()
                 logger.debug("lost device: " + self.device_id)
-                time.sleep(.5)
+
+            time.sleep(self.frequency)
 
     def configure(self):
         """
