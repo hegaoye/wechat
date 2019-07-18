@@ -15,7 +15,7 @@ class BillDao:
         sql = 'select * from bill where order_no="' + order_no + '"'
         return self.db.load(sql)
 
-    def insert(self, order_no, user, money, state, md5, order_time):
+    def insert(self, order_no, user, money, state, md5, order_time, account):
         """
         保存订单记录
         :param order_no: 支付订单号
@@ -24,9 +24,9 @@ class BillDao:
         :param state: 支付状态
         :param md5: md5值
         :param order_time: 交易时间
-        :return:
+        :param account: 支付账户
         """
-        sql = "insert into bill('order_no','user','money','state','md5','order_time') " \
-              "VALUES ('" + str(order_no) + "','" + str(user) + "','" + str(money) + "','" \
-              + str(state) + "','" + str(md5) + "','" + str(order_time) + "') "
+        sql = 'insert into bill("order_no","account","user","money","state","md5","order_time") values ("' + str(
+            order_no) + '","' + str(account) + '","' + str(user) + '","' + str(money) + '","' + str(
+            state) + '","' + str(md5) + '","' + str(order_time) + '")'
         self.db.insert(sql)
