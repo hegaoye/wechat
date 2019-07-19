@@ -29,15 +29,15 @@ class XMLPath(Enum):
     ABS_CONNECT_PATH = "/tmp/{device_id}/" + CONNECT
 
     # 手机存储地址
-    Sdcard_ABS_ALIPAY_APP_PATH = "/sdcard/" + ALIPAY_APP
-    Sdcard_ABS_ALIPAY_NOTIFY_PATH = "/sdcard/" + NOTIFY
-    Sdcard_ABS_DETAIL_PATH = "/sdcard/" + BILL_DETAIL
-    Sdcard_ABS_MY_PATH = "/sdcard/" + MY_PAGE
-    Sdcard_ABS_PERSONAL_PATH = "/sdcard/" + PERSONAL_PAGE
-    Sdcard_ABS_X_PATH = "/sdcard/" + X_PAGE
-    Sdcard_ABS_BILL_COORDINATE_PATH = "/sdcard/" + BILL_COORDINATE_PAGE
-    Sdcard_ABS_BILL_PATH = "/sdcard/" + BILL_LIST_PAGE
-    Sdcard_ABS_CONNECT_PATH = "/sdcard/" + CONNECT
+    Sdcard_ABS_ALIPAY_APP_PATH = "/storage/emulated/0/" + ALIPAY_APP
+    Sdcard_ABS_ALIPAY_NOTIFY_PATH = "/storage/emulated/0/" + NOTIFY
+    Sdcard_ABS_DETAIL_PATH = "/storage/emulated/0/" + BILL_DETAIL
+    Sdcard_ABS_MY_PATH = "/storage/emulated/0/" + MY_PAGE
+    Sdcard_ABS_PERSONAL_PATH = "/storage/emulated/0/" + PERSONAL_PAGE
+    Sdcard_ABS_X_PATH = "/storage/emulated/0/" + X_PAGE
+    Sdcard_ABS_BILL_COORDINATE_PATH = "/storage/emulated/0/" + BILL_COORDINATE_PAGE
+    Sdcard_ABS_BILL_PATH = "/storage/emulated/0/" + BILL_LIST_PAGE
+    Sdcard_ABS_CONNECT_PATH = "/storage/emulated/0/" + CONNECT
 
     # 工作空间
     Workspace_PATH = "/tmp/"
