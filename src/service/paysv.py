@@ -1,7 +1,6 @@
 # coding=utf-8
 import time
 
-from src.base.beanret import BeanRet
 from src.base.command import Command
 from src.base.http import post
 from src.base.log4py import logger
@@ -86,11 +85,11 @@ class PaySV:
                 sign = md5(text)
                 logger.debug(sign)
                 data["sign"] = sign
-                data["token"] = account_user["token"]
+                
                 header = {
                     'authorization': account_user["token"]
                 }
-                # TODO 调试后端接口
+
                 new_record_Url = self.alipay.setting_dao.load(Command.New_Record_Url)
                 if not new_record_Url:
                     return
