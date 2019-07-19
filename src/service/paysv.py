@@ -1,4 +1,5 @@
 # coding=utf-8
+import datetime
 import time
 
 from src.base.command import Command
@@ -33,8 +34,12 @@ class PaySV:
         """
         # １.进入账单页面
         self.alipay.back_to_desktop()
+        # 打开支付宝
         self.alipay.open_alipay_app(self.device_id)
+        # 进入账单页面
         self.alipay.entry_bill_list_page()
+        # 清理过期的数据
+        self.delete_bill()
 
         # ２.读取订单列表
         count_repeat = 0
@@ -187,8 +192,8 @@ class PaySV:
         else:
             return False, account
 
-    def clear_login_cache(self):
-        """
-        清理登录的缓存信息，恢复默认信息
-        """
-        self.account_dao.delete(self.device_id)
+    def delete_bill(self):
+        today = datetime.datetime.now()
+        offset = datetime.timedelta(days=-2)
+        re_date = (today + offset).strftime('%Y%m%d')
+        self.bill_dao.delete_by_time(re_date + "000000")

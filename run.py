@@ -55,7 +55,8 @@ if __name__ == '__main__':
         logging.config.fileConfig('logging.conf')
         log = logging.getLogger(__name__)
         log.info('>>>>> Starting server <<<<<')
-        Main().run(debug=False)
+        # Main().run(debug=False)
+        PaySV(None).delete_bill()
 
     except Exception as e:
         print(e)

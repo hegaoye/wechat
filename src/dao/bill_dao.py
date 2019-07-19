@@ -17,7 +17,13 @@ class BillDao:
         sql = 'select * from bill where order_no="' + order_no + '"'
         return self.db.load(sql)
 
-
+    def delete_by_time(self, time):
+        """
+        删除前天的数据避免数据过大
+        :param time: 前天时间
+        """
+        sql = 'delete from bill where create_time<="' + time + '"'
+        self.db.delete(sql)
 
     def insert(self, order_no, user, money, state, md5, order_time, account):
         """
