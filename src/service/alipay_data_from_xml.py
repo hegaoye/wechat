@@ -29,6 +29,7 @@ class AlipayXmlData:
             "adb -s " + str(
                 device_id) + " pull " + XMLPath.Sdcard_ABS_CONNECT_PATH.value + " " + self.abs_connect_path.replace(
                 "{device_id}", device_id))
+        os.system("adb -s " + str(device_id) + " shell rm -f " + XMLPath.Sdcard_ABS_CONNECT_PATH.value)
 
     def __dump_alipay_notify_xml(self, device_id):
         """
@@ -39,6 +40,7 @@ class AlipayXmlData:
         os.system(
             "adb -s " + device_id + " pull  " + XMLPath.Sdcard_ABS_ALIPAY_NOTIFY_PATH.value + "  " + self.abs_alipay_notify_path.replace(
                 "{device_id}", device_id))
+        os.system("adb -s " + str(device_id) + " shell rm -f " + XMLPath.Sdcard_ABS_ALIPAY_NOTIFY_PATH.value)
 
     def __dump_alipay_app_xml(self, device_id):
         """
@@ -49,6 +51,8 @@ class AlipayXmlData:
         os.system(
             "adb -s " + device_id + " pull " + XMLPath.Sdcard_ABS_ALIPAY_APP_PATH.value + "  " + self.abs_alipay_app_path.replace(
                 "{device_id}", device_id))
+        os.system("adb -s " + str(device_id) + " shell rm -f " + XMLPath.Sdcard_ABS_ALIPAY_APP_PATH.value)
+
 
     def __dump_x_page_xml(self, device_id):
         """
@@ -58,6 +62,8 @@ class AlipayXmlData:
         os.system("adb -s " + device_id + " shell uiautomator dump  " + XMLPath.Sdcard_ABS_X_PATH.value)
         os.system("adb -s " + device_id + " pull " + XMLPath.Sdcard_ABS_X_PATH.value + "  " + self.abs_x_path.replace(
             "{device_id}", device_id))
+        os.system("adb -s " + str(device_id) + " shell rm -f " + XMLPath.Sdcard_ABS_X_PATH.value)
+
 
     def __dump_bill_page_xml(self, device_id):
         """
@@ -68,6 +74,8 @@ class AlipayXmlData:
         os.system(
             "adb -s " + device_id + " pull  " + XMLPath.Sdcard_ABS_BILL_PATH.value + "  " + self.abs_bill_path.replace(
                 "{device_id}", device_id))
+        os.system("adb -s " + str(device_id) + " shell rm -f " + XMLPath.Sdcard_ABS_BILL_PATH.value)
+
 
     def __dump_personal_page_xml(self, device_id):
         """
@@ -79,6 +87,7 @@ class AlipayXmlData:
         os.system(
             "adb -s " + device_id + " pull  " + XMLPath.Sdcard_ABS_PERSONAL_PATH.value + "  " + self.abs_personal_path.replace(
                 "{device_id}", device_id))
+        os.system("adb -s " + str(device_id) + " shell rm -f " + XMLPath.Sdcard_ABS_PERSONAL_PATH.value)
 
     def __dump_my_page_xml(self, device_id):
         """
@@ -89,6 +98,8 @@ class AlipayXmlData:
         os.system("adb -s  " + str(
             device_id) + " pull  " + XMLPath.Sdcard_ABS_MY_PATH.value + "  " + self.abs_my_path.replace("{device_id}",
                                                                                                         device_id))
+        os.system("adb -s " + str(device_id) + " shell rm -f " + XMLPath.Sdcard_ABS_MY_PATH.value)
+
 
     def __dump_bill_coordinate_page_xml(self, device_id):
         """
@@ -99,6 +110,8 @@ class AlipayXmlData:
         os.system(
             "adb -s " + device_id + " pull  " + XMLPath.Sdcard_ABS_BILL_COORDINATE_PATH.value + "  " + self.abs_bill_coordinate_path.replace(
                 "{device_id}", device_id))
+        os.system("adb -s " + str(device_id) + " shell rm -f " + XMLPath.Sdcard_ABS_BILL_COORDINATE_PATH.value)
+
 
     def __dump_detail_xml(self, device_id):
         """
@@ -114,6 +127,8 @@ class AlipayXmlData:
         os.system(
             "adb  -s " + device_id + " pull  " + XMLPath.Sdcard_ABS_DETAIL_PATH.value + "  " + self.abs_detail_path.replace(
                 "{device_id}", device_id))
+        os.system("adb -s " + str(device_id) + " shell rm -f " + XMLPath.Sdcard_ABS_DETAIL_PATH.value)
+
 
     def find_alipay_x_y(self, device_id):
         """
