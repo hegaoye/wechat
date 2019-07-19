@@ -3,6 +3,7 @@ import time
 
 from src.base.beanret import BeanRet
 from src.base.command import Command
+from src.base.http import post
 from src.base.log4py import logger
 from src.base.md5 import md5
 from src.dao.account_dao import AccountDao
@@ -78,20 +79,23 @@ class PaySV:
                 time_str = data["time"]
 
                 # md5(money=&orderNo=&state=&time=&user= [appkey])
-                text = "money =" + str(money) + "&orderNo=" + str(order_no) + "&state=" + str(state) + \
+                text = "money=" + str(money) + "&orderNo=" + str(order_no) + "&state=" + str(state) + \
                        "&time=" + str(time_str) + "&user=" + str(user) + appkey
 
+                logger.debug(text)
                 sign = md5(text)
+                logger.debug(sign)
                 data["sign"] = sign
                 data["token"] = account_user["token"]
+                header = {
+                    'authorization': account_user["token"]
+                }
                 # TODO 调试后端接口
-                beanret = BeanRet()
-                beanret.success = True
                 new_record_Url = self.alipay.setting_dao.load(Command.New_Record_Url)
                 if not new_record_Url:
                     return
 
-                # beanret = post(new_record_Url, data)
+                beanret = post(new_record_Url["v"], data, header)
                 if beanret.success:
                     # ６.缓存结果
                     bill_obj = self.bill_dao.load(order_no)
@@ -158,15 +162,11 @@ class PaySV:
             "sign": md5("account=" + account + "&appkey=" + appkey + appkey)
         }
 
-        # TODO 调试后端接口
-        beanret = BeanRet()
-        beanret.success = True
-        beanret.data = "you_are_logined"
-        login_url = self.alipay.setting_dao.load(Command.Login_Url)
-        if not login_url:
+        login_url_setting = self.alipay.setting_dao.load(Command.Login_Url)
+        if not login_url_setting:
             return
 
-        # beanret = post(login_url, data)
+        beanret = post(login_url_setting['v'], data)
 
         if beanret.success:
             # 设置屏幕分辨率

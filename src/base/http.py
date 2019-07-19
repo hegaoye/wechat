@@ -20,7 +20,7 @@ def get(url):
         return beanret
 
 
-def post(url, data=None):
+def post(url, data=None, headers=None):
     try:
         logger.info(url)
         setting_dao = SettingDao()
@@ -28,11 +28,15 @@ def post(url, data=None):
         url = host_setting["v"] + url
         postdata = parse.urlencode(data).encode('utf-8')
         logger.debug("请求url: " + url)
-        logger.debug("请求参数: " + postdata)
-        req = request.Request(url, data=postdata, method="POST")
+        logger.debug("请求参数: " + str(postdata))
+        if headers:
+            req = request.Request(url, data=postdata, method="POST", headers=headers)
+        else:
+            req = request.Request(url, data=postdata, method="POST")
         response = request.urlopen(req)
         result = response.read().decode(encoding='utf-8')
         beanret = BeanRet().to_obj(result)
         return beanret
-    except:
+    except Exception as e:
+        print(e)
         return BeanRet(success=False)

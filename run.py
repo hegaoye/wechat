@@ -56,5 +56,6 @@ if __name__ == '__main__':
         log = logging.getLogger(__name__)
         log.info('>>>>> Starting server <<<<<')
         Main().run(debug=True)
+
     except Exception as e:
         print(e)
