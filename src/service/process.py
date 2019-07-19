@@ -50,7 +50,6 @@ class Process(threading.Thread):
 
                     if is_login:
                         is_notify = self.pay_sv.detect_alipay_notify()
-                        is_notify = True
                         if is_notify:
                             self.pay_sv.detect_income(alipay_account)
             except:
