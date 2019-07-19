@@ -10,7 +10,7 @@ class Command(Enum):
     Detect = "Detect"
     Sleep = "Sleep"
     Host = "Host"
-    Appkey = "Appkey"
+    App = "App"
     App_x_y = "App_x_y"
     Bill_x_y = "Bill_x_y"
     Scroll_Page_Size = "Scroll_Page_Size"

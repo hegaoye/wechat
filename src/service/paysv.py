@@ -62,7 +62,7 @@ class PaySV:
 
                 # ５.提交订单
                 setting_dao = SettingDao()
-                appkey_setting = setting_dao.load(Command.Appkey)
+                appkey_setting = setting_dao.load(Command.App)
                 if not appkey_setting:
                     break
                 appkey = appkey_setting["v"]
@@ -85,7 +85,7 @@ class PaySV:
                 sign = md5(text)
                 logger.debug(sign)
                 data["sign"] = sign
-                
+
                 header = {
                     'authorization': account_user["token"]
                 }
@@ -150,7 +150,7 @@ class PaySV:
         account = self.alipay.get_alipay_account(self.device_id)
         if not account:
             return
-        appkey_setting = self.alipay.setting_dao.load(Command.Appkey)
+        appkey_setting = self.alipay.setting_dao.load(Command.App)
         if not appkey_setting:
             return
         appkey = appkey_setting["v"]
