@@ -97,12 +97,13 @@ class AliPay:
         os.system("adb -s " + self.device_id + " shell input swipe 900 0 900 900 100")
         time.sleep(.2)
 
-    def refresh_bill_list(self, ms=500):
+    def refresh_bill_list(self, x, y):
         """
         下拉刷新页面
         """
-        # todo 修改下拉刷刷新的坐标问题
-        os.system("adb -s " + self.device_id + " shell input swipe 900 600 900 2300 " + str(ms))
+        x = str(int(x) / 2)
+        y = str(y)
+        os.system("adb -s " + self.device_id + " shell input swipe " + x + " 600 " + x + " " + y + " ")
         time.sleep(.5)
 
     def scroll_down(self, x1, y1, x2, y2):
@@ -211,7 +212,19 @@ class AliPay:
         """
         is_bill_list_page = self.alipayxmldata.is_bill_list_page(self.device_id)
         if is_bill_list_page:
-            self.refresh_bill_list(ms=300)
+            account = self.account_dao.load_by_device_id(self.device_id)
+            if account:
+                if account["screen_x_y"]:
+                    x_y = str(account["screen_x_y"])
+                    x_y_arr = x_y.split(",")
+                    x, y = x_y_arr[0], x_y_arr[1]
+                    self.refresh_bill_list(x=x, y=y)
+                else:
+                    self.refresh_bill_list(x=600, y=2300)
+            else:
+                self.refresh_bill_list(x=600, y=2300)
+
+
         else:
             is_my_page = self.jump_to_my_page()
             if is_my_page:
