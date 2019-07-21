@@ -2,6 +2,7 @@
 import datetime
 import time
 
+from src.base.beanret import BeanRet
 from src.base.command import Command
 from src.base.http import post
 from src.base.log4py import logger
@@ -14,6 +15,7 @@ from src.service.alipay import AliPay
 
 class PaySV:
     def __init__(self, device_id, debug=False):
+        self.debug = debug
         self.device_id = device_id
         self.alipay = AliPay(device_id, debug)
         self.bill_dao = BillDao()
@@ -99,7 +101,13 @@ class PaySV:
                 if not new_record_Url:
                     return
 
-                beanret = post(new_record_Url["v"], data, header)
+                if self.debug:
+                    beanret = BeanRet()
+                    beanret.success = True
+                    beanret.data = "login_success"
+                else:
+                    beanret = post(new_record_Url["v"], data, header)
+
                 if beanret.success:
                     # ６.缓存结果
                     bill_obj = self.bill_dao.load(order_no)
@@ -170,7 +178,12 @@ class PaySV:
         if not login_url_setting:
             return
 
-        beanret = post(login_url_setting['v'], data)
+        if self.debug:
+            beanret = BeanRet()
+            beanret.success = True
+            beanret.data = "login_success"
+        else:
+            beanret = post(login_url_setting['v'], data)
 
         if beanret.success:
             # 设置屏幕分辨率
