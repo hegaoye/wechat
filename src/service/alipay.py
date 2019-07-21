@@ -59,11 +59,22 @@ class AliPay:
         :return:
         """
         list = os.popen("adb -s " + self.device_id + " shell wm size")
+        screen_x_y = None
         for i in list:
             screen_str = str(i).replace("\n", "")
             if screen_str.find("Override size") >= 0:
-                screen_str = screen_str.replace("Override size: ", "").replace("x", ",")
-                return screen_str
+                screen_x_y = screen_str.replace("Override size: ", "").replace("x", ",")
+                break
+
+        if screen_x_y:
+            return screen_x_y
+        else:
+            list = os.popen("adb -s " + self.device_id + " shell wm size")
+            for i in list:
+                screen_str = str(i).replace("\n", "")
+                if screen_str.find("Physical size") >= 0:
+                    screen_x_y = screen_str.replace("Physical size: ", "").replace("x", ",")
+                    return screen_x_y
 
     def back(self):
         """
