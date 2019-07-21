@@ -42,4 +42,4 @@ class DetectDevice(threading.Thread):
                         self.pay_sv.save_device(device_id)
                         logger.debug("发现新设备[" + str(device_id) + "]")
 
-            time.sleep(10)
+            time.sleep(5)
