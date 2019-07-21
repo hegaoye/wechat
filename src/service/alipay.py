@@ -94,7 +94,7 @@ class AliPay:
         """
         打开通知栏信息
         """
-        os.system("adb -s " + self.device_id + " shell input swipe 900 0 900 900 100")
+        os.system("adb -s " + self.device_id + " shell cmd statusbar expand-notifications")
         time.sleep(.2)
 
     def refresh_bill_list(self, x, y):

@@ -4,7 +4,7 @@ import os
 
 from src.base.xml_path_enum import XMLPath
 from src.service.node import Node
-from src.service.parse_xml import load_xml, list_attr_value
+from src.service.parse_xml import load_xml, list_attr_value, load_detail_xml
 
 
 class AlipayXmlData:
@@ -53,7 +53,6 @@ class AlipayXmlData:
                 "{device_id}", device_id))
         os.system("adb -s " + str(device_id) + " shell rm -f " + XMLPath.Sdcard_ABS_ALIPAY_APP_PATH.value)
 
-
     def __dump_x_page_xml(self, device_id):
         """
         生成判断账单的点击坐标页面
@@ -63,7 +62,6 @@ class AlipayXmlData:
         os.system("adb -s " + device_id + " pull " + XMLPath.Sdcard_ABS_X_PATH.value + "  " + self.abs_x_path.replace(
             "{device_id}", device_id))
         os.system("adb -s " + str(device_id) + " shell rm -f " + XMLPath.Sdcard_ABS_X_PATH.value)
-
 
     def __dump_bill_page_xml(self, device_id):
         """
@@ -75,7 +73,6 @@ class AlipayXmlData:
             "adb -s " + device_id + " pull  " + XMLPath.Sdcard_ABS_BILL_PATH.value + "  " + self.abs_bill_path.replace(
                 "{device_id}", device_id))
         os.system("adb -s " + str(device_id) + " shell rm -f " + XMLPath.Sdcard_ABS_BILL_PATH.value)
-
 
     def __dump_personal_page_xml(self, device_id):
         """
@@ -100,7 +97,6 @@ class AlipayXmlData:
                                                                                                         device_id))
         os.system("adb -s " + str(device_id) + " shell rm -f " + XMLPath.Sdcard_ABS_MY_PATH.value)
 
-
     def __dump_bill_coordinate_page_xml(self, device_id):
         """
         导出我的页面并仅提供给提取 账单的坐标提取使用 xml
@@ -111,7 +107,6 @@ class AlipayXmlData:
             "adb -s " + device_id + " pull  " + XMLPath.Sdcard_ABS_BILL_COORDINATE_PATH.value + "  " + self.abs_bill_coordinate_path.replace(
                 "{device_id}", device_id))
         os.system("adb -s " + str(device_id) + " shell rm -f " + XMLPath.Sdcard_ABS_BILL_COORDINATE_PATH.value)
-
 
     def __dump_detail_xml(self, device_id):
         """
@@ -128,7 +123,6 @@ class AlipayXmlData:
             "adb  -s " + device_id + " pull  " + XMLPath.Sdcard_ABS_DETAIL_PATH.value + "  " + self.abs_detail_path.replace(
                 "{device_id}", device_id))
         os.system("adb -s " + str(device_id) + " shell rm -f " + XMLPath.Sdcard_ABS_DETAIL_PATH.value)
-
 
     def find_alipay_x_y(self, device_id):
         """
@@ -194,31 +188,23 @@ class AlipayXmlData:
         """
         self.__dump_detail_xml(device_id)
         path = self.abs_detail_path.replace("{device_id}", device_id)
-        result_list = load_xml(path)
-        if result_list.__len__() < 11:
-            result_list = load_xml(path, "content-desc")
+        result_list = load_detail_xml(path)
+        if result_list.__len__() > 16:
             data = {
-                "user": Node().to_obj(result_list[3]).desc,
-                "orderNo": Node().to_obj(result_list[11]).desc,
-                "money": Node().to_obj(result_list[4]).desc.replace("+", ""),
-                "state": Node().to_obj(result_list[5]).desc,
-                "time": Node().to_obj(result_list[9]).desc
+                "user": Node().to_obj(result_list[4]).text,
+                "orderNo": Node().to_obj(result_list[16]).text,
+                "money": Node().to_obj(result_list[5]).text.replace("+", ""),
+                "state": Node().to_obj(result_list[6]).text,
+                "time": Node().to_obj(result_list[14]).text
             }
-        else:
-            data = {
-                "user": Node().to_obj(result_list[3]).text,
-                "orderNo": Node().to_obj(result_list[11]).text,
-                "money": Node().to_obj(result_list[4]).text.replace("+", ""),
-                "state": Node().to_obj(result_list[5]).text,
-                "time": Node().to_obj(result_list[9]).text
-            }
-        return data
+            return data
 
     def get_alipay_account(self, device_id):
         """
         找到用户账户账户
         :return: 账户
         """
+        self.__dump_x_page_xml(device_id)
         path = self.abs_x_path.replace("{device_id}", device_id)
         result_list = list_attr_value(path, "resource-id",
                                       "com.alipay.android.phone.wealth.home:id/user_account")
@@ -361,13 +347,13 @@ class AlipayXmlData:
                 "click_x_y": None,
             }
             node = Node().to_obj(income)
-            if node.text.find("收钱码收款") >= 0:
+            if node.text.find("收钱码收款") >= 0 or node.text.find("收款") >= 0:
                 index = result_list.index(income)
                 for i in range(num):
                     try:
                         node_data = Node().to_obj(result_list[index + i])
                         if i == 0:
-                            data["user"] = node_data.text.replace("收钱码收款-来自", "")
+                            data["user"] = node_data.text.replace("收钱码收款-来自", "").replace("收款-", "")
                         elif i == 1:
                             money = node_data.text
                             if money.find("-") >= 0:
@@ -403,13 +389,3 @@ class AlipayXmlData:
                     income_list.append(data)
 
         return income_list
-
-
-if __name__ == '__main__':
-    alipay = AlipayXmlData()
-    print(alipay.detail())
-    # print(alipay.is_user_center_page())
-    # print(alipay.is_personal_apge())
-    # print(alipay.get_alipay_account())
-    # print(alipay.get_bill_click_x_y())
-    # print(alipay.income_list())
