@@ -9,6 +9,7 @@ from src.base.log4py import logger
 from src.base.md5 import md5
 from src.dao.account_dao import AccountDao
 from src.dao.bill_dao import BillDao
+from src.dao.device_dao import DeviceDao
 from src.dao.setting_dao import SettingDao
 from src.service.alipay import AliPay
 
@@ -20,6 +21,7 @@ class PaySV:
         self.alipay = AliPay(device_id, debug)
         self.bill_dao = BillDao()
         self.account_dao = AccountDao()
+        self.device_dao = DeviceDao()
         self.page_count = int(self.alipay.setting_dao.load(Command.Scroll_Page_Size)["v"])
         self.count_repeat = int(self.alipay.setting_dao.load(Command.Count_Repeat)["v"])
 
@@ -210,3 +212,23 @@ class PaySV:
         offset = datetime.timedelta(days=-2)
         re_date = (today + offset).strftime('%Y%m%d')
         self.bill_dao.delete_by_time(re_date + "000000")
+
+    def load_device_by_id(self, device_id):
+        """
+        查询一个设备
+        :param device_id: 设备id
+        :return: 设备
+        """
+        return self.device_dao.load(device_id)
+
+    def load_device(self):
+        return self.device_dao.loadone()
+
+    def save_device(self, device_id):
+        self.device_dao.insert(device_id)
+
+    def update_device(self, device_id):
+        self.device_dao.update(device_id)
+
+    def delete_device(self, device_id):
+        self.device_dao.delete_by_id(device_id)

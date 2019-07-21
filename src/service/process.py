@@ -34,9 +34,17 @@ class Process(threading.Thread):
         logger.debug("running thread for device [" + self.device_id + "] ")
         is_connected = False
         is_login = False
+
+        # 尝试3次如果没有设备不在线就直接退出自己
+        count_connected = 0
         while True:
             if self.is_stop:
                 logger.debug("return while")
+                return
+
+            if count_connected == 3:
+                self.pay_sv.delete_device(self.device_id)
+                self.is_stop = True
                 return
 
             try:
@@ -52,6 +60,8 @@ class Process(threading.Thread):
                         is_notify = self.pay_sv.detect_alipay_notify()
                         if is_notify:
                             self.pay_sv.detect_income(alipay_account)
+                else:
+                    count_connected += 1
             except:
                 is_connected = False
                 is_login = False

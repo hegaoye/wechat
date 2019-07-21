@@ -3,7 +3,9 @@ import logging.config
 import time
 
 from src.base.file_tool import FileTool
+from src.base.log4py import logger
 from src.base.xml_path_enum import XMLPath
+from src.service.detect_device import DetectDevice
 from src.service.paysv import PaySV
 from src.service.process import Process
 
@@ -25,29 +27,28 @@ class Main:
         return self.pay_sv.device_list()
 
     def run(self, frequency=3, debug=False):
-        """
-        系统的入口
-        :param frequency: 休眠频率 秒 为单位
-        """
-        list = self.device_list()
-        if list:
-            # 为设备创建临时工作目录
-            for device_id in list:
+        logger.debug("启动设备上线检测")
+        DetectDevice().start()
+
+        logger.debug("尝试启动上线的设备")
+        while True:
+            device_id = self.pay_sv.load_device()
+            if device_id:
                 self.file_tool.remove(XMLPath.Workspace_PATH.value + str(device_id))
                 self.file_tool.create_folder(XMLPath.Workspace_PATH.value + str(device_id))
-
-            for device_id in list:
                 process_thread = None
                 try:
                     process_thread = Process(str(device_id), frequency, debug)
                     process_thread.start()
+                    self.pay_sv.update_device(device_id)
+                    logger.debug("启动对设备[" + str(device_id) + "]的控制")
                     time.sleep(1)
                 except:
                     log.debug("异常退出设备 : " + str(device_id))
                     if process_thread:
                         process_thread.stop()
-
-        log.debug("线程启动完毕")
+            else:
+                time.sleep(3)
 
 
 if __name__ == '__main__':
