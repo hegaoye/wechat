@@ -184,9 +184,13 @@ class AliPay:
         :return: alipay account
         """
         if self.alipayxmldata.is_user_center_page(device_id):
-            alipay_account = self.alipayxmldata.get_alipay_account(device_id)
-            if alipay_account:
-                return alipay_account
+            x, y = self.alipayxmldata.get_personal_x_y(device_id)
+            self.click(x, y)
+            time.sleep(.5)
+            account, account_name, taobao_account = self.alipayxmldata.get_alipay_account(device_id)
+            self.back()
+            if account and account_name and taobao_account:
+                return account, account_name, taobao_account
             else:
                 return None
         else:

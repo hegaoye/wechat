@@ -162,8 +162,8 @@ class PaySV:
         self.alipay.back_to_desktop()
         self.alipay.open_alipay_app(self.device_id)
         self.alipay.jump_to_my_page()
-        account = self.alipay.get_alipay_account(self.device_id)
-        if not account:
+        account, accountName, taobao_account = self.alipay.get_alipay_account(self.device_id)
+        if not account or not accountName or not taobao_account:
             return
         appkey_setting = self.alipay.setting_dao.load(Command.App)
         if not appkey_setting:
@@ -172,8 +172,9 @@ class PaySV:
 
         data = {
             "account": account,
+            "accountName": accountName,
             "appkey": appkey,
-            "sign": md5("account=" + account + "&appkey=" + appkey + appkey)
+            "sign": md5("account=" + account + "&accountName=" + accountName + "&appkey=" + appkey + appkey)
         }
 
         login_url_setting = self.alipay.setting_dao.load(Command.Login_Url)
@@ -232,3 +233,6 @@ class PaySV:
 
     def delete_device(self, device_id):
         self.device_dao.delete_by_id(device_id)
+
+    def clear_device(self):
+        self.device_dao.delete()

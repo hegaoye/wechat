@@ -143,7 +143,7 @@ def load_detail_xml(abs_path, attr="text", attr2="content-desc"):
 
 
 if __name__ == '__main__':
-    abs_path = '/home/scrapy_pay_client/p4_detail.xml'
+    abs_path = '/home/scrapy_pay_client/account.xml'
     result_list = load_detail_xml(abs_path)
     # result_list = load_xml(abs_path, attr="content-desc")
 

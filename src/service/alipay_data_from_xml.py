@@ -208,9 +208,18 @@ class AlipayXmlData:
         self.__dump_x_page_xml(device_id)
         path = self.abs_x_path.replace("{device_id}", device_id)
         result_list = list_attr_value(path, "resource-id",
+                                      "com.alipay.mobile.antui:id/list_right_text")
+        if result_list.__len__() == 3:
+            return Node().to_obj(result_list[1]).text, Node().to_obj(result_list[0]).text, Node().to_obj(
+                result_list[2]).text
+
+    def get_personal_x_y(self, device_id):
+        self.__dump_x_page_xml(device_id)
+        path = self.abs_x_path.replace("{device_id}", device_id)
+        result_list = list_attr_value(path, "resource-id",
                                       "com.alipay.android.phone.wealth.home:id/user_account")
         if result_list.__len__() > 0:
-            return Node().to_obj(result_list[0]).text
+            return Node().to_obj(result_list[0]).get_bounds()
 
     def find_page_keywords(self, device_id, keyworkds, frequency=1):
         """

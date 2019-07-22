@@ -30,7 +30,7 @@ class DetectDevice(threading.Thread):
         2.数据运算，计算并保存新设备
         3.移除设备
         '''
-
+        self.pay_sv.clear_device()
         while True:
             # 1.获取设备列表
             device_list = self.pay_sv.device_list()
