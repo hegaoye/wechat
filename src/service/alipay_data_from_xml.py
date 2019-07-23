@@ -354,7 +354,7 @@ class AlipayXmlData:
                 "goods": None,
                 "today": None,
                 "time": None,
-                "click_x_y": None,
+                "click_x_y": None
             }
             node = Node().to_obj(income)
             if node.text.find("收钱码收款") >= 0 or node.text.find("收款") >= 0:
