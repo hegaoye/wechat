@@ -178,7 +178,6 @@ class AlipayXmlData:
         """
         path = self.abs_alipay_notify_path.replace("{device_id}", device_id)
         result_list = list_attr_value(path, "content-desc", "清")
-        # result_list = list_attr_value(path, "resource-id", "com.android.systemui:id/delete")
         if result_list.__len__() > 0:
             return Node().to_obj(result_list[0]).get_bounds()
 
