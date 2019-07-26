@@ -196,6 +196,17 @@ class AliPay:
         else:
             return None
 
+    def is_shop(self):
+        """
+        是否是商家判断
+        :return: 1是，0否
+        """
+        is_shop = self.alipayxmldata.find_page_keywords(self.device_id, "商家服务")
+        if is_shop:
+            return 1
+        else:
+            return 0
+
     def jump_to_my_page(self):
         """
         进入我的页面
@@ -257,11 +268,11 @@ class AliPay:
         income_list = self.alipayxmldata.income_list(self.device_id, limit)
         return income_list
 
-    def order_detail(self, x, y):
+    def order_detail(self, x, y, is_shop):
         """
         读取订单支付详情信息
         :return:　data
         """
         self.click(x, y)
         time.sleep(.5)
-        return self.alipayxmldata.detail(self.device_id)
+        return self.alipayxmldata.detail(self.device_id, is_shop)

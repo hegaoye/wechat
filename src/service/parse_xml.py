@@ -143,12 +143,17 @@ def load_detail_xml(abs_path, attr="text", attr2="content-desc"):
 
 
 if __name__ == '__main__':
-    abs_path = '/home/scrapy_pay_client/account.xml'
+    abs_path = '/home/scrapy_pay_client/detail2.xml'
     result_list = load_detail_xml(abs_path)
     # result_list = load_xml(abs_path, attr="content-desc")
 
+    # 个人
     print(result_list[4]["text"], result_list[5]["text"], result_list[6]["text"], result_list[14]["text"],
           result_list[16]["text"])
+
+    # 商铺
+    print(result_list[4]["text"], result_list[5]["text"], result_list[6]["text"], result_list[10]["text"],
+          result_list[12]["text"])
     node = Node()
     for x in result_list:
         print(x)

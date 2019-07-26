@@ -47,6 +47,8 @@ class PaySV:
 
         # ２.读取订单列表
         count_repeat = 0
+        account_load = self.account_dao.load_by_device_id(self.device_id)
+        is_shop = account_load["is_shop"]
         for page in range(self.page_count):
             income_list = self.alipay.income_list()
             if income_list.__len__() <= 0:
@@ -57,7 +59,7 @@ class PaySV:
 
                 # ３.读取订单详情
                 chick_x_y = income["click_x_y"]
-                data = self.alipay.order_detail(chick_x_y[0], chick_x_y[1])
+                data = self.alipay.order_detail(chick_x_y[0], chick_x_y[1], is_shop)
                 self.alipay.back()
 
                 # ４.验证订单是否重复
@@ -80,15 +82,20 @@ class PaySV:
                 account_user = account_dao.load_by_account_appkey(alipay_account, appkey)
                 if not account_user:
                     break
+                app_secret_setting = self.alipay.setting_dao.load(Command.APP_Secret)
+                if not app_secret_setting:
+                    return
+
+                app_secret = app_secret_setting["v"]
 
                 user = data["user"]
                 money = data["money"]
                 state = data["state"]
                 time_str = data["time"]
 
-                # md5(money=&orderNo=&state=&time=&user= [appkey])
+                # md5(money=&orderNo=&state=&time=&user= [app_secret])
                 text = "money=" + str(money) + "&orderNo=" + str(order_no) + "&state=" + str(state) + \
-                       "&time=" + str(time_str) + "&user=" + str(user) + appkey
+                       "&time=" + str(time_str) + "&user=" + str(user) + app_secret
 
                 logger.debug(text)
                 sign = md5(text)
@@ -162,19 +169,26 @@ class PaySV:
         self.alipay.back_to_desktop()
         self.alipay.open_alipay_app(self.device_id)
         self.alipay.jump_to_my_page()
+        is_shop = self.alipay.is_shop()
         account, accountName, taobao_account = self.alipay.get_alipay_account(self.device_id)
         if not account or not accountName or not taobao_account:
             return
         appkey_setting = self.alipay.setting_dao.load(Command.App)
         if not appkey_setting:
             return
+
+        app_secret_setting = self.alipay.setting_dao.load(Command.APP_Secret)
+        if not app_secret_setting:
+            return
+
         appkey = appkey_setting["v"]
+        app_secret = app_secret_setting["v"]
 
         data = {
             "account": account,
             "accountName": accountName,
             "appkey": appkey,
-            "sign": md5("account=" + account + "&accountName=" + accountName + "&appkey=" + appkey + appkey)
+            "sign": md5("account=" + account + "&accountName=" + accountName + "&appkey=" + appkey + app_secret)
         }
 
         login_url_setting = self.alipay.setting_dao.load(Command.Login_Url)
@@ -201,7 +215,7 @@ class PaySV:
             if account_load:
                 self.account_dao.delete(self.device_id)
 
-            self.account_dao.insert(account, appkey, token, self.device_id, screen_x_y)
+            self.account_dao.insert(account, appkey, token, self.device_id, screen_x_y, is_shop)
 
             logger.debug("初始化配置完成")
             return True, account

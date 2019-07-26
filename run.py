@@ -56,7 +56,7 @@ if __name__ == '__main__':
         logging.config.fileConfig('logging.conf')
         log = logging.getLogger(__name__)
         log.info('>>>>> Starting server <<<<<')
-        Main().run(debug=True)
+        Main().run(debug=False)
 
     except Exception as e:
         print(e)

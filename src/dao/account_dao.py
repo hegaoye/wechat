@@ -11,7 +11,7 @@ class AccountDao:
         result = self.db.load(sql)
         if result:
             return {"account": result[0], "appkey": result[1], "token": result[2], "device_id": result[3],
-                    "screen_x_y": result[4], "bill_x_y": result[5], "app_x_y": result[6]}
+                    "screen_x_y": result[4], "bill_x_y": result[5], "app_x_y": result[6], "is_shop": result[7]}
         return None
 
     def load_by_account_appkey(self, alipay_account, appkey):
@@ -19,7 +19,7 @@ class AccountDao:
         result = self.db.load(sql)
         if result:
             return {"account": result[0], "appkey": result[1], "token": result[2], "device_id": result[3],
-                    "screen_x_y": result[4], "bill_x_y": result[5], "app_x_y": result[6]}
+                    "screen_x_y": result[4], "bill_x_y": result[5], "app_x_y": result[6], "is_shop": result[7]}
         return None
 
     def load_by_account(self, account):
@@ -27,7 +27,7 @@ class AccountDao:
         result = self.db.load(sql)
         if result:
             return {"account": result[0], "appkey": result[1], "token": result[2], "device_id": result[3],
-                    "screen_x_y": result[4], "bill_x_y": result[5], "app_x_y": result[6]}
+                    "screen_x_y": result[4], "bill_x_y": result[5], "app_x_y": result[6], "is_shop": result[7]}
         return None
 
     def load_by_device_id(self, device_id):
@@ -35,7 +35,7 @@ class AccountDao:
         result = self.db.load(sql)
         if result:
             return {"account": result[0], "appkey": result[1], "token": result[2], "device_id": result[3],
-                    "screen_x_y": result[4], "bill_x_y": result[5], "app_x_y": result[6]}
+                    "screen_x_y": result[4], "bill_x_y": result[5], "app_x_y": result[6], "is_shop": result[7]}
         return None
 
     def update(self, account, token):
@@ -60,7 +60,7 @@ class AccountDao:
         sql = 'update user set app_x_y="' + str(app_x_y) + '"  where device_id="' + device_id + '"'
         self.db.update(sql)
 
-    def insert(self, account, appkey, token, device_id, screen_x_y):
+    def insert(self, account, appkey, token, device_id, screen_x_y, is_shop=0):
         """
         保存用户信息，设备信息
         :param account: 用户账户
@@ -68,10 +68,11 @@ class AccountDao:
         :param token: 登录token
         :param device_id: 设备编码
         :param screen_x_y: 屏幕的x,y坐标
+        :param is_shop: 是否是商铺
         """
-        sql = 'insert into user("account","appkey","token","device_id","screen_x_y") values ("' + str(
+        sql = 'insert into user("account","appkey","token","device_id","screen_x_y","is_shop") values ("' + str(
             account) + '","' + str(appkey) + '","' + str(token) + '","' + str(device_id) + '","' + str(
-            screen_x_y) + '")'
+            screen_x_y) + '","' + str(is_shop) + '")'
         self.db.insert(sql)
 
     def delete(self, device_id):

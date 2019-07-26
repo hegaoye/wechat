@@ -11,6 +11,7 @@ class Command(Enum):
     Sleep = "Sleep"
     Host = "Host"
     App = "App"
+    APP_Secret = "APP_Secret"
     App_x_y = "App_x_y"
     Bill_x_y = "Bill_x_y"
     Scroll_Page_Size = "Scroll_Page_Size"

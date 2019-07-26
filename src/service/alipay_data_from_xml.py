@@ -181,7 +181,7 @@ class AlipayXmlData:
         if result_list.__len__() > 0:
             return Node().to_obj(result_list[0]).get_bounds()
 
-    def detail(self, device_id):
+    def detail(self, device_id, is_shop):
         """
         转换xml数据，并提取关键数据，返回json格式数据
         :return: json格式数据
@@ -190,14 +190,26 @@ class AlipayXmlData:
         path = self.abs_detail_path.replace("{device_id}", device_id)
         result_list = load_detail_xml(path)
         if result_list.__len__() > 16:
-            data = {
-                "user": Node().to_obj(result_list[4]).text,
-                "orderNo": Node().to_obj(result_list[16]).text,
-                "money": Node().to_obj(result_list[5]).text.replace("+", ""),
-                "state": Node().to_obj(result_list[6]).text,
-                "time": Node().to_obj(result_list[14]).text
-            }
+            if is_shop == 0:
+                data = {
+                    "user": Node().to_obj(result_list[4]).text,
+                    "orderNo": Node().to_obj(result_list[16]).text,
+                    "money": Node().to_obj(result_list[5]).text.replace("+", ""),
+                    "state": Node().to_obj(result_list[6]).text,
+                    "time": Node().to_obj(result_list[14]).text
+                }
+            elif is_shop == 1:
+                data = {
+                    "user": Node().to_obj(result_list[4]).text,
+                    "orderNo": Node().to_obj(result_list[12]).text,
+                    "money": Node().to_obj(result_list[5]).text.replace("+", ""),
+                    "state": Node().to_obj(result_list[6]).text,
+                    "time": Node().to_obj(result_list[10]).text
+                }
+
             return data
+        else:
+            return None
 
     def get_alipay_account(self, device_id):
         """
