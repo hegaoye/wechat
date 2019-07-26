@@ -1,9 +1,6 @@
 # coding=utf-8
-import configparser
 import os
 import shutil
-
-from settings import PITOP_CONF
 
 
 class Singleton(object):
@@ -15,10 +12,6 @@ class Singleton(object):
 
 
 class FileTool(Singleton):
-    def __init__(self):
-        self.cf = configparser.ConfigParser()
-        self.cf.read(PITOP_CONF)
-
     def create_file(self, path):
         """
         create a empty file
@@ -126,25 +119,6 @@ class FileTool(Singleton):
                 all_file.append(os.path.join(dir_path, name))
 
         return all_file
-
-    def workspace(self, path=None):
-        """
-        generate a workspace path like workspace is /home/workspace/ ,
-        the path is test.py,then you can get /home/workspace/test.py
-        :param path:
-        :return:
-        """
-        workspace = self.cf.get("sys", "workspace")
-        if not path:
-            return workspace
-
-        if not os.path.exists(workspace):
-            os.makedirs(workspace)
-
-        if str(workspace).endswith("/"):
-            return workspace + path
-        else:
-            return workspace + "/" + path
 
     def python3_cmd(self, pyfile):
         """
