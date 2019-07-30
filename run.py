@@ -39,9 +39,9 @@ class Main:
                 self.file_tool.create_folder(XMLPath.Workspace_PATH.value + str(device_id))
                 process_thread = None
                 try:
+                    self.pay_sv.update_device(device_id)
                     process_thread = Process(str(device_id), frequency, debug)
                     process_thread.start()
-                    self.pay_sv.update_device(device_id)
                     logger.debug("启动对设备[" + str(device_id) + "]的控制")
                     time.sleep(1)
                 except:
