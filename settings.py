@@ -9,5 +9,6 @@ _basedir = os.path.abspath(os.path.dirname(__file__))
 
 # 数据库配置
 DATABASE_PATH = os.path.join(_basedir, 'data.db')
+LOGGIN_CONF = os.path.join(_basedir, 'logging.conf')
 
 del os

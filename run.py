@@ -2,6 +2,7 @@
 import logging.config
 import time
 
+from settings import LOGGIN_CONF
 from src.base.file_tool import FileTool
 from src.base.log4py import logger
 from src.base.xml_path_enum import XMLPath
@@ -53,7 +54,7 @@ class Main:
 
 if __name__ == '__main__':
     try:
-        logging.config.fileConfig('logging.conf')
+        logging.config.fileConfig(LOGGIN_CONF)
         log = logging.getLogger(__name__)
         log.info('>>>>> Starting server <<<<<')
         Main().run(debug=False)
