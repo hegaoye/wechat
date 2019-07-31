@@ -19,7 +19,7 @@ class DetectDevice(threading.Thread):
         stop thread
         :return:
         '''
-        logger.debug("stop thread ! ")
+        logger.info("stop thread ! ")
         self.is_stop = True
         self.join()
 
@@ -40,6 +40,6 @@ class DetectDevice(threading.Thread):
                     device = self.pay_sv.load_device_by_id(device_id)
                     if not device:
                         self.pay_sv.save_device(device_id)
-                        logger.debug("发现新设备[" + str(device_id) + "]")
+                        logger.info("发现新设备[" + str(device_id) + "]")
 
             time.sleep(5)

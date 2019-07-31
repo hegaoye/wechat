@@ -6,9 +6,10 @@ import sqlite3
 
 from settings import DATABASE_PATH
 from src.base.log4py import logger
+from src.base.singleton import Singleton
 
 
-class Sqlite3Tools:
+class Sqlite3Tools(Singleton):
     def __init__(self):
         """
         链接数据库

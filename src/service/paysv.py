@@ -37,22 +37,29 @@ class PaySV:
         :return:
         """
         # １.进入账单页面
+        logger.debug(">> back_to_desktop")
         self.alipay.back_to_desktop()
         # 打开支付宝
+        logger.debug(">> open_alipay_app")
         self.alipay.open_alipay_app(self.device_id)
         # 进入账单页面
+        logger.debug(">> entry_bill_list_page")
         self.alipay.entry_bill_list_page()
         # 清理过期的数据
+        logger.debug(">> delete_bill")
         self.delete_bill()
 
         # ２.读取订单列表
         count_repeat = 0
+        logger.debug(">> 读取订单列表数据")
         account_load = self.account_dao.load_by_device_id(self.device_id)
         is_shop = account_load["is_shop"]
         for page in range(self.page_count):
             income_list = self.alipay.income_list()
             if income_list.__len__() <= 0:
                 continue
+
+            logger.debug(">> 解析订单详情")
             for income in income_list:
                 if count_repeat == int(self.count_repeat):
                     break
@@ -158,7 +165,7 @@ class PaySV:
         监听支付宝的通知信息
         :return: True/False
         """
-        logger.debug("监听支付宝的通知信息")
+        logger.info("监听支付宝的通知信息")
         return self.alipay.detect_alilpay_notify(self.device_id)
 
     def configure(self):

@@ -27,8 +27,8 @@ def post(url, data=None, headers=None):
         host_setting = setting_dao.load(Command.Host)
         url = host_setting["v"] + url
         postdata = parse.urlencode(data).encode('utf-8')
-        logger.debug("请求url: " + url)
-        logger.debug("请求参数: " + str(postdata))
+        logger.info("请求url: " + url)
+        logger.info("请求参数: " + str(postdata))
         if headers:
             req = request.Request(url, data=postdata, method="POST", headers=headers)
         else:

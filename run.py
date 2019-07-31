@@ -28,10 +28,10 @@ class Main:
         return self.pay_sv.device_list()
 
     def run(self, frequency=3, debug=False):
-        logger.debug("启动设备上线检测")
+        logger.info("启动设备上线检测")
         DetectDevice().start()
 
-        logger.debug("尝试启动上线的设备")
+        logger.info("尝试启动上线的设备")
         while True:
             device_id = self.pay_sv.load_device()
             if device_id:
@@ -42,10 +42,10 @@ class Main:
                     self.pay_sv.update_device(device_id)
                     process_thread = Process(str(device_id), frequency, debug)
                     process_thread.start()
-                    logger.debug("启动对设备[" + str(device_id) + "]的控制")
+                    logger.info("启动对设备[" + str(device_id) + "]的控制")
                     time.sleep(1)
                 except:
-                    log.debug("异常退出设备 : " + str(device_id))
+                    log.error("异常退出设备 : " + str(device_id))
                     if process_thread:
                         process_thread.stop()
             else:
