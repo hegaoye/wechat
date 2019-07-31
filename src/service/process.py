@@ -11,9 +11,10 @@ from src.service.paysv import PaySV
 
 
 class Process(threading.Thread):
-    def __init__(self, device_id, frequency=3, debug=False):
+    def __init__(self, device_id, frequency=1, debug=False):
         threading.Thread.__init__(self)
         self.device_id = str(device_id)
+        self.debug = debug
         self.pay_sv = PaySV(str(device_id), debug=debug)
         self.frequency = frequency
         self.is_stop = False
@@ -59,6 +60,9 @@ class Process(threading.Thread):
 
                     if is_login:
                         is_notify = self.pay_sv.detect_alipay_notify()
+                        if self.debug:
+                            is_notify = True
+
                         if is_notify:
                             self.pay_sv.detect_income(alipay_account)
                 else:

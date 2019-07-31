@@ -219,7 +219,7 @@ class AliPay:
             return True
         else:
             self.back()
-            return self.jump_to_my_page()
+            return False
 
     def entry_bill_list_page(self):
         """
@@ -228,33 +228,28 @@ class AliPay:
         is_bill_list_page = self.alipayxmldata.is_bill_list_page(self.device_id)
         if is_bill_list_page:
             account = self.account_dao.load_by_device_id(self.device_id)
-            if account:
-                if account["screen_x_y"]:
-                    x_y = str(account["screen_x_y"])
-                    x_y_arr = x_y.split(",")
-                    x, y = x_y_arr[0], x_y_arr[1]
-                    self.refresh_bill_list(x=x, y=y)
-                else:
-                    self.refresh_bill_list(x=600, y=2300)
-            else:
-                self.refresh_bill_list(x=600, y=2300)
+            if account and account["screen_x_y"]:
+                x_y = str(account["screen_x_y"])
+                x_y_arr = x_y.split(",")
+                x, y = x_y_arr[0], x_y_arr[1]
+                self.refresh_bill_list(x=x, y=y)
+                return
 
-
+            self.refresh_bill_list(x=600, y=2300)
         else:
             is_my_page = self.jump_to_my_page()
             if is_my_page:
                 account = self.account_dao.load_by_device_id(self.device_id)
-                if account:
-                    if account["bill_x_y"]:
-                        x_y = str(account["bill_x_y"])
-                        x_y_arr = x_y.split(",")
-                        x, y = x_y_arr[0], x_y_arr[1]
-                    else:
-                        x, y = self.alipayxmldata.get_bill_click_x_y(self.device_id)
-                        self.account_dao.update_bill_x_y(self.device_id, str(x) + "," + str(y))
-                else:
-                    x, y = self.alipayxmldata.get_bill_click_x_y(self.device_id)
+                if account and account["bill_x_y"]:
+                    x_y = str(account["bill_x_y"])
+                    x_y_arr = x_y.split(",")
+                    x, y = x_y_arr[0], x_y_arr[1]
+                    self.click(x, y)
+                    time.sleep(.5)
+                    return
 
+                x, y = self.alipayxmldata.get_bill_click_x_y(self.device_id)
+                self.account_dao.update_bill_x_y(self.device_id, str(x) + "," + str(y))
                 self.click(x, y)
                 time.sleep(.5)
             else:
