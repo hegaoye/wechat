@@ -51,6 +51,7 @@ class AliPay:
         x2 = str(x2)
         y2 = str(y2)
         os.system('adb -s ' + self.device_id + ' shell input swipe ' + x1 + ' ' + y1 + ' ' + x2 + ' ' + y2)
+
         time.sleep(.2)
 
     def screen_resolution(self):
