@@ -15,6 +15,15 @@ class ArtOfWar:
     def back(self):
         self.run_cammand("adb -s S2D7N19328004812 shell  input keyevent 4")
 
+    def close_ad(self):
+        self.run_cammand("adb -s  S2D7N19328004812  shell input tap 950 450")
+
+    def sand(self):
+        self.run_cammand("adb -s  S2D7N19328004812  shell input tap 800 1200")
+
+    def snow(self):
+        self.run_cammand("adb -s  S2D7N19328004812  shell input tap 800 1600")
+
     def open_fire_jimmy(self):
         self.run_cammand("adb -s  RELBB18A19500825  shell input tap 540 1900")
 
@@ -23,6 +32,15 @@ class ArtOfWar:
 
     def back_jimmy(self):
         self.run_cammand("adb -s RELBB18A19500825 shell  input keyevent 4")
+
+    def close_ad_jimmy(self):
+        self.run_cammand("adb -s  RELBB18A19500825  shell input tap 950 450")
+
+    def sand_jimmy(self):
+        self.run_cammand("adb -s  RELBB18A19500825  shell input tap 800 1100")
+
+    def snow_jimmy(self):
+        self.run_cammand("adb -s  RELBB18A19500825  shell input tap 800 1700")
 
     def run_cammand(self, cammand):
         os.system(cammand)
@@ -36,11 +54,13 @@ class ArtOfWar:
             self.open_fire()
             sleep(.5)
             self.open_fire()
-            sleep(25)
+            sleep(32)
             self.play_ad()
-            sleep(33)
+            sleep(32)
             self.back()
-            sleep(1)
+            sleep(.5)
+            # self.close_ad()
+            # sleep(.2)
 
     def run_jimmy(self):
         '''
@@ -51,8 +71,54 @@ class ArtOfWar:
             self.open_fire_jimmy()
             sleep(.5)
             self.open_fire_jimmy()
-            sleep(25)
+            sleep(32)
             self.play_ad_jimmy()
-            sleep(33)
+            sleep(32)
             self.back_jimmy()
-            sleep(1)
+            sleep(.5)
+            # self.close_ad_jimmy()
+            # sleep(.2)
+
+    def run_sand(self):
+        while True:
+            self.sand()
+            sleep(.5)
+            self.open_fire()
+            sleep(15)
+            self.play_ad()
+            sleep(32)
+            self.back()
+            sleep(.5)
+
+    def run_snow(self):
+        while True:
+            self.snow()
+            sleep(.5)
+            self.open_fire()
+            sleep(15)
+            self.play_ad()
+            sleep(32)
+            self.back()
+            sleep(.5)
+
+    def run_sand_jimmy(self):
+        while True:
+            self.sand_jimmy()
+            sleep(.5)
+            self.open_fire_jimmy()
+            sleep(15)
+            self.play_ad_jimmy()
+            sleep(32)
+            self.back_jimmy()
+            sleep(.5)
+
+    def run_snow_jimmy(self):
+        while True:
+            self.sand_jimmy()
+            sleep(.5)
+            self.open_fire_jimmy()
+            sleep(15)
+            self.play_ad_jimmy()
+            sleep(32)
+            self.back_jimmy()
+            sleep(.5)
