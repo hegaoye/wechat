@@ -36,8 +36,11 @@ class Wechat(AppBase):
         :return:
         """
         self.get_bottom_x_y()
-        # self.get_contact_info()
-        # self.get_groups()
+        self.get_myself_info()
+        myself_info = {"wxId": str(self.wx_id), "nickName": str(self.nick_name)}
+        contacts = self.get_contact_info()
+        groups = self.get_groups()
+        return myself_info, contacts, groups
 
     def __try_to_find_wx_app(self):
         """
@@ -119,7 +122,6 @@ class Wechat(AppBase):
             '//*[@resource-id="com.tencent.mm:id/cwx"]/android.widget.LinearLayout[1]/android.widget.RelativeLayout[2]')
         # 打开通讯录
         contact_tab.click()
-        sleep(.5)
 
     def __list_contacts(self):
         """
@@ -132,7 +134,6 @@ class Wechat(AppBase):
             if len(contact_list) > 0:
                 contact_name_list = []
                 for contact in contact_list:
-                    print(contact.get_text())
                     contact_name_list.append(contact.get_text())
 
                 # 去重联系人
@@ -455,5 +456,5 @@ if __name__ == '__main__':
     # wechat.search_contact("立心")
     # wechat.open_search_result("立心")
     # wechat.send_msg("这个是什么？")
-    wechat.batch_send_msg("4人的消息，感觉咋样？发给了其他人了，是不是很爽", ["立坤", "AAA . 立心","小鹏","伯融"])
+    wechat.batch_send_msg("进一步测", ["立坤", "AAA . 立心", "小鹏", "伯融"])
     # wechat.batch_send_msg_by_search("""晚点和伯融一起聊下？""", ["AAA . 立心", "立坤"])

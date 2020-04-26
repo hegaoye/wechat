@@ -2,7 +2,7 @@
 import datetime
 import time
 
-from src.base.beanret import BeanRet
+from src.base.r import R
 from src.base.command import Command
 from src.base.http import post
 from src.base.log4py import logger
@@ -118,7 +118,7 @@ class PaySV:
                     return
 
                 if self.debug:
-                    beanret = BeanRet()
+                    beanret = R()
                     beanret.success = True
                     beanret.data = "login_success"
                 else:
@@ -203,7 +203,7 @@ class PaySV:
             return
 
         if self.debug:
-            beanret = BeanRet()
+            beanret = R()
             beanret.success = True
             beanret.data = "login_success"
         else:

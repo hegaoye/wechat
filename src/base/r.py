@@ -6,7 +6,7 @@ return a json object like {"code":"0000","success":True,"info":"failed!","data":
 """
 
 
-class BeanRet:
+class R:
     def __init__(self, code="0000", success=False, info="failed", data=None):
         self.code = code
         self.success = success
@@ -32,11 +32,11 @@ class BeanRet:
 
 
 if __name__ == '__main__':
-    beanret = BeanRet()
+    beanret = R()
     print(beanret.info)
     print(beanret.to_json())
     jsonStr = json.dumps(beanret.__dict__)
     print(jsonStr)
     beanretJson = json.loads(jsonStr)
-    beanret2 = BeanRet()
+    beanret2 = R()
     beanret2.to_obj(jsonStr)

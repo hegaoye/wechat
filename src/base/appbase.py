@@ -33,7 +33,7 @@ class AppBase:
         手机的序列号获取
         :return:
         """
-        return self.d.serial
+        return str(self.d.serial)
 
     def screen_on(self):
         """
