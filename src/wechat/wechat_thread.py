@@ -24,7 +24,9 @@ class WechatThread(threading.Thread):
 
         while True:
             # 获取信息
-            info, contacts = self.try_get_task()
+            # info, contacts = self.try_get_task()
+            info="代码已经提交，看群里，有地址说明可以下载后研究，具体细节这里在优化提交中"
+            contacts=["立坤", "AAA . 立心", "小鹏", "伯融"]
             # 群发信息
             self.wechat.batch_send_msg(info, contacts)
             # 休眠1分钟再尝试获取任务
