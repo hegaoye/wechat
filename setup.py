@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='scrapy client',  # package name
+    name='wechat',  # package name
     version='0.1',  # package version
     author='',
     author_email='',
@@ -10,7 +10,7 @@ setup(
     keywords=['src'],
     package=find_packages(include=['src']),
     include_package_data=True,
-    platforms="scrapy client",
+    platforms="wechat",
     entry_points={
         'console_scripts': [
             'run=run:main'

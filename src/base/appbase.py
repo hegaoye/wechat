@@ -5,6 +5,10 @@ import uiautomator2 as u2
 
 
 class AppBase:
+    """
+    app通用的功能的封装
+    """
+
     def __init__(self, ip):
         self.d = u2.connect(ip)
 
