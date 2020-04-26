@@ -34,8 +34,8 @@ class ProcessJimmy(threading.Thread):
         logger.debug("running thread for device [" + self.device_id + "] ")
 
         try:
-            # ArtOfWar().run_sand_jimmy()
-            ArtOfWar().run_jimmy()
+            ArtOfWar(self.device_id).run_sand_jimmy()
+            # ArtOfWar(self.device_id).run_jimmy()
             logger.debug("connected to device:" + self.device_id)
 
         except:

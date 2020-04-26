@@ -143,7 +143,7 @@ def load_detail_xml(abs_path, attr="text", attr2="content-desc"):
 
 
 if __name__ == '__main__':
-    abs_path = '/home/scrapy_pay_client/detail2.xml'
+    abs_path = '/Users/chendehui/workspaces/art_of_war/ui_xml/index.xml'
     result_list = load_detail_xml(abs_path)
     # result_list = load_xml(abs_path, attr="content-desc")
 
@@ -162,6 +162,6 @@ if __name__ == '__main__':
         #     print(node.get_bounds()[0])
         #     print(node.get_bounds()[1])
 
-    list_attr = list_attr_value(abs_path, "resource-id", "com.alipay.android.phone.wealth.home:id/tab_description")
+    list_attr = list_attr_value(abs_path, "resource-id", "com.tencent.mm:id/e0n")
     for attr in list_attr:
         print(attr)

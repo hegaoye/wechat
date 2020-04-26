@@ -3,44 +3,44 @@ from time import sleep
 
 
 class ArtOfWar:
-    def __init__(self):
-        pass
+    def __init__(self, device_id):
+        self.device_id = str(device_id)
 
     def open_fire(self):
-        self.run_cammand("adb -s  S2D7N19328004812  shell input tap 540 2000")
+        self.run_cammand("adb -s  "+ self.device_id+"  shell input tap 540 2000")
 
     def play_ad(self):
-        self.run_cammand("adb -s  S2D7N19328004812  shell input tap 360 1500")
+        self.run_cammand("adb -s  "+ self.device_id+"  shell input tap 360 1500")
 
     def back(self):
-        self.run_cammand("adb -s S2D7N19328004812 shell  input keyevent 4")
+        self.run_cammand("adb -s "+ self.device_id+" shell  input keyevent 4")
 
     def close_ad(self):
-        self.run_cammand("adb -s  S2D7N19328004812  shell input tap 950 450")
+        self.run_cammand("adb -s  "+ self.device_id+"  shell input tap 950 450")
 
     def sand(self):
-        self.run_cammand("adb -s  S2D7N19328004812  shell input tap 800 1200")
+        self.run_cammand("adb -s  "+ self.device_id+"  shell input tap 800 1200")
 
     def snow(self):
-        self.run_cammand("adb -s  S2D7N19328004812  shell input tap 800 1600")
+        self.run_cammand("adb -s  "+ self.device_id+"  shell input tap 800 1600")
 
     def open_fire_jimmy(self):
-        self.run_cammand("adb -s  RELBB18A19500825  shell input tap 540 1900")
+        self.run_cammand("adb -s  "+ self.device_id+"  shell input tap 540 1900")
 
     def play_ad_jimmy(self):
-        self.run_cammand("adb -s  RELBB18A19500825  shell input tap 360 1500")
+        self.run_cammand("adb -s  "+ self.device_id+"  shell input tap 360 1500")
 
     def back_jimmy(self):
-        self.run_cammand("adb -s RELBB18A19500825 shell  input keyevent 4")
+        self.run_cammand("adb -s "+ self.device_id+" shell  input keyevent 4")
 
     def close_ad_jimmy(self):
-        self.run_cammand("adb -s  RELBB18A19500825  shell input tap 950 450")
+        self.run_cammand("adb -s  "+ self.device_id+"  shell input tap 950 450")
 
     def sand_jimmy(self):
-        self.run_cammand("adb -s  RELBB18A19500825  shell input tap 800 1100")
+        self.run_cammand("adb -s  "+ self.device_id+"  shell input tap 800 1100")
 
     def snow_jimmy(self):
-        self.run_cammand("adb -s  RELBB18A19500825  shell input tap 800 1700")
+        self.run_cammand("adb -s  "+ self.device_id+"  shell input tap 800 1700")
 
     def run_cammand(self, cammand):
         os.system(cammand)
@@ -84,7 +84,7 @@ class ArtOfWar:
             self.sand()
             sleep(.5)
             self.open_fire()
-            sleep(15)
+            sleep(10)
             self.play_ad()
             sleep(32)
             self.back()
@@ -106,7 +106,7 @@ class ArtOfWar:
             self.sand_jimmy()
             sleep(.5)
             self.open_fire_jimmy()
-            sleep(15)
+            sleep(10)
             self.play_ad_jimmy()
             sleep(32)
             self.back_jimmy()

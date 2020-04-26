@@ -34,8 +34,8 @@ class Process(threading.Thread):
         logger.debug("running thread for device [" + self.device_id + "] ")
 
         try:
-            # ArtOfWar().run_sand()
-            ArtOfWar().run()
+            # ArtOfWar(self.device_id).run_sand()
+            ArtOfWar(self.device_id).run()
             logger.debug("connected to device:" + self.device_id)
 
         except:
