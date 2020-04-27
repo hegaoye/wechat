@@ -56,3 +56,11 @@ network={
 其中``key_mgmt=WPA-PSK``默认即可，大部分默认可以，如果重启发现无法连接网络就需要修改或者注释掉
 
 6.配置完毕后可以针对具体的场景上写image镜像文件，需要是直接复制克隆修改数据即可
+
+
+7. 启动 uiautomator2 的后台进程
+参考链接https://github.com/openatx/uiautomator2#selector
+python3 -m uiautomator2 init
+
+启动调试 web界面，图形化可视
+weditor

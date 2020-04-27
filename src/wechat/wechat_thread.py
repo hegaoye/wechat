@@ -17,20 +17,37 @@ class WechatThread(threading.Thread):
 
     def run(self):
         if self.wechat is None:
+            print("开始控制ip", self.ip)
             self.wechat = Wechat(self.ip)
+            # self.wechat.get_bottom_x_y()
             # self.wechat.app_start()
             # myself_info, contacts, groups = self.wechat.init_wx()
+            # print(groups)
             # self.post_wechat_info(myself_info, contacts, groups)
 
         while True:
+            sleep(1800)
+
             # 获取信息
             # info, contacts = self.try_get_task()
-            info="代码已经提交，看群里，有地址说明可以下载后研究，具体细节这里在优化提交中"
-            contacts=["立坤", "AAA . 立心", "小鹏", "伯融"]
+            info = """现货抢购
+
+KN95 封边机
+KN95 点焊机
+KN95 鼻梁机
+
+全部现货，工厂直销可视频可看货可现场试机
+不含税不含发票诚意需要的请联系
+
+
+电话咨询 18703830130 
+微信咨询 18589077222（勿打电话给此号）"""
+
+            # contacts = ["立坤", "AAA . 立心", "小鹏", "伯融"]
             # 群发信息
-            self.wechat.batch_send_msg(info, contacts)
+            # self.wechat.batch_send_msg(info, contacts)
+            self.wechat.batch_send_msg_by_keyword(info, "口罩")
             # 休眠1分钟再尝试获取任务
-            sleep(60)
 
     def try_get_task(self):
         """
@@ -56,5 +73,8 @@ class WechatThread(threading.Thread):
 
 
 if __name__ == '__main__':
-    wxt = WechatThread("192.168.0.28")
-    wxt.start()
+    wxt1 = WechatThread("192.168.0.28")
+    wxt1.start()
+    sleep(3)
+    wxt2 = WechatThread("192.168.0.23")
+    wxt2.start()

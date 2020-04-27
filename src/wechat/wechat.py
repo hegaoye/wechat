@@ -1,6 +1,8 @@
 # coding=utf-8
 from time import sleep
 
+import re
+
 from src.base.appbase import AppBase
 
 
@@ -248,18 +250,42 @@ class Wechat(AppBase):
             sleep(.5)
             self.__get_search_force()
 
-    def open_search_result(self, name):
+    def open_search_result(self, name, check_nums=1) -> bool:
         """
         打开搜索的结果，并根据搜索的名字进行选择
         :param name: 搜索的名字
+        :param check_nums: 检查元素不存在的次数统计，默认即可，无需传参
         """
         result_element = self.d(resourceId="com.tencent.mm:id/g8b", textContains=name)
         if result_element.exists():
             result_element[0].click()
-            sleep(.5)
+            return True
         else:
+            if check_nums == 3:
+                return False
+
+            check_nums += 1
             sleep(.5)
-            self.open_search_result(name)
+            return self.open_search_result(name, check_nums)
+
+    def is_group(self) -> bool:
+        """
+        判断是否是群
+        :return: True 是群 False 不是群
+        """
+        element = self.d(resourceId="com.tencent.mm:id/g7_")
+        if not element.exists():
+            return False
+
+        name = element.get_text()
+        if not name:
+            return False
+
+        is_group = re.search('\(\d+\)$', str(name))
+        if is_group:
+            return True
+        else:
+            return False
 
     def clear_search(self):
         """
@@ -340,9 +366,10 @@ class Wechat(AppBase):
             self.d.send_keys(contact)
             sleep(1)
             # 打开搜索结果
-            self.open_search_result(contact)
-            # 发送消息
-            self.send_msg(text)
+            if self.open_search_result(contact):
+                # 发送消息
+                self.send_msg(text)
+
             # 清空搜索框
             self.clear_search()
 
@@ -351,18 +378,60 @@ class Wechat(AppBase):
 
         return True
 
+    def batch_send_msg_by_keyword(self, msg, keyword):
+        self.__get_search_force()
+        self.d.send_keys(keyword)
+        self.d(scrollable=True).scroll.vert.forward(steps=10)
+        sleep(1)
+        self.try_open_group_more()
+        self.__group_chat(msg)
+        self.cancel_search()
+        self.cancel_search()
+
+    def try_open_group_more(self, check_nums=0):
+        element = self.d(resourceId="com.tencent.mm:id/g6i", text="更多群聊")
+        if element.exists():
+            element.click()
+            sleep(1)
+        else:
+            if check_nums == 10:
+                return
+            check_nums += 1
+            sleep(1)
+            self.try_open_group_more(check_nums)
+
+    def __group_chat(self, msg, history_list=None):
+        if history_list is None:
+            history_list = []
+
+        group_chat_list = self.d(resourceId="com.tencent.mm:id/g8b")
+        if len(group_chat_list) > 0:
+            for group_chat in group_chat_list:
+                group_name = group_chat.get_text()
+                if group_name in history_list:
+                    continue
+                history_list.append(group_name)
+                if len(history_list) >= 80:
+                    return
+                group_chat.click()
+                self.send_msg(msg)
+
+            self.d(scrollable=True).scroll.vert.forward(steps=50)
+            sleep(1)
+            self.__group_chat(msg, history_list)
+
     def batch_send_msg(self, text, contact_list):
         """
         群发消息，根据策略不同选择的发送方式不同
         :param text: 需要发送的文本内容
         :param contact_list: 联系人列表
         """
-        if len(contact_list) > 0 and len(contact_list) > 10:
-            # 滚动翻页群发
-            self.batch_send_msg_by_scroll(text, contact_list)
-        else:
-            # 搜索定向发送
-            self.batch_send_msg_by_search(text, contact_list)
+        # if len(contact_list) > 0 and len(contact_list) > 10:
+        #     # 滚动翻页群发
+        #     self.batch_send_msg_by_scroll(text, contact_list)
+        # else:
+        # 搜索定向发送
+        self.batch_send_msg_by_search(text, contact_list)
 
     def batch_send_msg_by_scroll(self, text, contact_list):
         """
@@ -418,8 +487,13 @@ class Wechat(AppBase):
             for dialog in dialogs:
                 dialog_name = dialog.get_text()
                 if dialog_name in contact_list:
+                    dialog_height = dialog.center()[1]
+                    if int(dialog_height) > self.max_y:
+                        continue
                     dialog.click()
-                    sleep(.5)
+                    if not self.is_group():
+                        continue
+                    print("操作", dialog_name)
                     # 发送消息
                     self.send_msg(msg)
                     # 删除发送过消息的列表信息
@@ -427,7 +501,7 @@ class Wechat(AppBase):
                     if len(contact_list) == 0:
                         return
 
-            # 向上滚动
+            # 向下滚动
             self.d(scrollable=True).scroll.vert.forward(steps=50)
             # 递归查找
             self.__batch_send_msg(msg, contact_list)
@@ -445,7 +519,7 @@ class Wechat(AppBase):
 
 
 if __name__ == '__main__':
-    wechat = Wechat("192.168.0.28")
+    wechat = Wechat("192.168.0.23")
     # wechat.init_wx()
     # wechat.test()
     # wechat.unlock()
@@ -456,5 +530,17 @@ if __name__ == '__main__':
     # wechat.search_contact("立心")
     # wechat.open_search_result("立心")
     # wechat.send_msg("这个是什么？")
-    wechat.batch_send_msg("进一步测", ["立坤", "AAA . 立心", "小鹏", "伯融"])
+    # wechat.batch_send_msg("进一步测", ["立坤", "AAA . 立心", "小鹏", "伯融"])
     # wechat.batch_send_msg_by_search("""晚点和伯融一起聊下？""", ["AAA . 立心", "立坤"])
+    wechat.batch_send_msg_by_keyword("""现货抢购
+
+KN95 封边机
+KN95 点焊机
+KN95 鼻梁机
+
+全部现货，工厂直销可视频可看货可现场试机
+不含税不含发票诚意需要的请联系
+
+
+电话咨询 18703830130 
+微信咨询 18589077222（勿打电话给此号）""", "口罩")
