@@ -250,23 +250,23 @@ class Wechat(AppBase):
             sleep(.5)
             self.__get_search_force()
 
-    def open_search_result(self, name, check_nums=1) -> bool:
+    def open_search_result(self, name, try_nums=1) -> bool:
         """
         打开搜索的结果，并根据搜索的名字进行选择
         :param name: 搜索的名字
-        :param check_nums: 检查元素不存在的次数统计，默认即可，无需传参
+        :param try_nums: 检查元素不存在的次数统计，默认即可，无需传参
         """
         result_element = self.d(resourceId="com.tencent.mm:id/g8b", textContains=name)
         if result_element.exists():
             result_element[0].click()
             return True
         else:
-            if check_nums == 3:
+            if try_nums == 3:
                 return False
 
-            check_nums += 1
+            try_nums += 1
             sleep(.5)
-            return self.open_search_result(name, check_nums)
+            return self.open_search_result(name, try_nums)
 
     def is_group(self) -> bool:
         """
@@ -378,47 +378,52 @@ class Wechat(AppBase):
 
         return True
 
-    def batch_send_msg_by_keyword(self, msg, keyword):
+    def batch_send_msg_by_keyword(self, msg, keyword, except_contacts):
+        """
+        通过搜索关键词来对应群组
+        :param msg: 消息
+        :param keyword: 搜索关键词
+        :param except_contacts: 例外的通讯录
+        :return:
+        """
         self.__get_search_force()
         self.d.send_keys(keyword)
         self.d(scrollable=True).scroll.vert.forward(steps=10)
         sleep(1)
         self.try_open_group_more()
-        self.__group_chat(msg)
+        self.__group_chat(msg, except_contacts)
         self.cancel_search()
+        sleep(.5)
         self.cancel_search()
 
-    def try_open_group_more(self, check_nums=0):
+    def try_open_group_more(self, try_nums=0):
         element = self.d(resourceId="com.tencent.mm:id/g6i", text="更多群聊")
         if element.exists():
             element.click()
             sleep(1)
         else:
-            if check_nums == 10:
+            if try_nums == 10:
                 return
-            check_nums += 1
+            try_nums += 1
             sleep(1)
-            self.try_open_group_more(check_nums)
+            self.try_open_group_more(try_nums)
 
-    def __group_chat(self, msg, history_list=None):
-        if history_list is None:
-            history_list = []
-
+    def __group_chat(self, msg, except_contacts):
         group_chat_list = self.d(resourceId="com.tencent.mm:id/g8b")
         if len(group_chat_list) > 0:
             for group_chat in group_chat_list:
                 group_name = group_chat.get_text()
-                if group_name in history_list:
+                if str(group_name) in except_contacts:
                     continue
-                history_list.append(group_name)
-                if len(history_list) >= 80:
+                except_contacts.append(group_name)
+                if len(except_contacts) >= 80:
                     return
                 group_chat.click()
                 self.send_msg(msg)
 
             self.d(scrollable=True).scroll.vert.forward(steps=50)
             sleep(1)
-            self.__group_chat(msg, history_list)
+            self.__group_chat(msg, except_contacts)
 
     def batch_send_msg(self, text, contact_list):
         """
@@ -517,9 +522,197 @@ class Wechat(AppBase):
             self.max_y = (int(y) - 151)
             return x, self.max_y
 
+    def login_get_sms(self, phone) -> bool:
+        """
+        尝试采用短信方式登录
+        :param phone: 手机号
+        :return: True/False
+        """
+        if phone:
+            # 输入手机号
+            is_phone_finish = self.__try_force_phone_input(phone)
+            if is_phone_finish:
+                # 登录的下一步按钮点击
+                is_next_finish = self.__try_force_next_step()
+                if is_next_finish:
+                    # 尝试切换为短信登录
+                    is_force_sms = self.__try_force_sms()
+                    if is_force_sms:
+                        # 尝试点击发送短信按钮
+                        is_send_sms_finish = self.__try_send_sms()
+                        if is_send_sms_finish:
+                            # 尝试点击对话框确认发送短信提醒
+                            return self.__try_click_send_sms_ok()
+        return False
+
+    def __try_force_phone_input(self, phone, try_nums=5) -> bool:
+        """
+        输入手机号
+        :param phone: 手机号
+        :param try_nums: 重试次数
+        :return: True/False
+        """
+        element = self.d(resourceId="com.tencent.mm:id/bfl", text="请填写手机号")
+        if element.exists():
+            element.click()
+            sleep(.5)
+            self.d.send_keys(phone)
+            sleep(1)
+            return True
+        else:
+            if try_nums <= 0:
+                return False
+            try_nums -= 1
+            sleep(1)
+            return self.__try_force_phone_input(phone)
+
+    def __try_force_next_step(self, try_nums=5) -> bool:
+        """
+        登录的下一步按钮点击
+        :param try_nums: 尝试次数
+        :return:
+        """
+        next_step_element = self.d(resourceId="com.tencent.mm:id/e09", text="下一步")
+        if next_step_element.exists():
+            next_step_element.click()
+            sleep(2)
+            return True
+        else:
+            if try_nums <= 0:
+                return False
+            try_nums -= 1
+            sleep(1)
+            return self.__try_force_next_step()
+
+    def __try_force_sms(self, try_nums=5) -> bool:
+        """
+        尝试切换为短信登录
+        :param try_nums: 尝试次数
+        :return: True/False
+        """
+        sms_button_elemnt = self.d(resourceId="com.tencent.mm:id/d35", text="用短信验证码登录")
+        if sms_button_elemnt.exists():
+            sms_button_elemnt.click()
+            sleep(.5)
+            return True
+        else:
+            if try_nums <= 0:
+                return False
+            try_nums -= 1
+            sleep(1)
+            return self.__try_force_sms()
+
+    def __try_send_sms(self, try_nums=5) -> bool:
+        """
+        尝试点击发送短信按钮
+        :param try_nums: 尝试次数
+        :return: True/False
+        """
+        send_sms_button_element = self.d(resourceId="com.tencent.mm:id/f9_", text="获取验证码")
+        if send_sms_button_element.exists():
+            send_sms_button_element.click()
+            sleep(1)
+            return True
+        else:
+            if try_nums <= 0:
+                return False
+            try_nums -= 1
+            return self.__try_send_sms()
+
+    def __try_click_send_sms_ok(self, try_nums=5):
+        """
+        尝试点击对话框确认发送短信提醒
+        :param try_nums: 重试次数
+        :return: True/False
+        """
+        alert_element = self.d(resourceId="com.tencent.mm:id/dm3", text="确定")
+        if alert_element.exists():
+            alert_element.click()
+            sleep(1)
+            return True
+        else:
+            if try_nums <= 0:
+                return False
+            try_nums -= 1
+            sleep(1)
+            return self.__try_click_send_sms_ok()
+
+    def login_input_sms(self, sms) -> bool:
+        """
+        输入短信，确认登录
+        :param sms: 短信
+        :return:
+        """
+        if sms:
+            # 尝试输入短信
+            is_sms_input_finish = self.__try_input_sms(sms)
+            if is_sms_input_finish:
+                # 尝试点击登录按钮进行登录
+                is_login = self.__try_click_login_button()
+                if is_login:
+                    # 尝试检查短信错误提示框
+                    return not self.__try_force_sms_error_alert()
+        return False
+
+    def __try_input_sms(self, sms, try_nums=5) -> bool:
+        """
+        尝试输入短信
+        :param sms:短信
+        :param try_nums:重试次数
+        :return: True/False
+        """
+        sms_input_element = self.d(resourceId="com.tencent.mm:id/bfl", text="请填写验证码")
+        if sms_input_element.exists():
+            sms_input_element.click()
+            sleep(.5)
+            self.d.send_keys(sms)
+            sleep(.5)
+            return True
+        else:
+            if try_nums <= 0:
+                return False
+            try_nums -= 1
+            return self.__try_input_sms(sms)
+
+    def __try_click_login_button(self, try_nums=5) -> bool:
+        """
+        尝试点击登录按钮进行登录
+        :param try_nums: 重试次数
+        :return: True/False
+        """
+        login_button_element = self.d(resourceId="com.tencent.mm:id/e09", text="登录")
+        if login_button_element.exists():
+            login_button_element.click()
+            sleep(1)
+            return True
+        else:
+            if try_nums <= 0:
+                return False
+            try_nums -= 1
+            return self.__try_click_login_button()
+
+    def __try_force_sms_error_alert(self, try_nums=3):
+        """
+        尝试检查短信错误提示框
+        :param try_nums: 重试次数
+        :return: True/False
+        """
+        error_alert_element = self.d(resourceId="com.tencent.mm:id/jh")
+        if error_alert_element.exists():
+            self.d(resourceId="com.tencent.mm:id/dm3").click()
+            sleep(.5)
+            self.d(resourceId="com.tencent.mm:id/dm").click()
+            return True
+        else:
+            if try_nums <= 0:
+                return False
+            try_nums -= 1
+            sleep(.5)
+            return self.__try_force_sms_error_alert()
+
 
 if __name__ == '__main__':
-    wechat = Wechat("192.168.0.23")
+    wechat = Wechat("192.168.0.28")
     # wechat.init_wx()
     # wechat.test()
     # wechat.unlock()
@@ -532,6 +725,8 @@ if __name__ == '__main__':
     # wechat.send_msg("这个是什么？")
     # wechat.batch_send_msg("进一步测", ["立坤", "AAA . 立心", "小鹏", "伯融"])
     # wechat.batch_send_msg_by_search("""晚点和伯融一起聊下？""", ["AAA . 立心", "立坤"])
+    # wechat.login_get_sms("15565063321")
+    # wechat.login_input_sms("345567")
     wechat.batch_send_msg_by_keyword("""现货抢购
 
 KN95 封边机
@@ -543,4 +738,4 @@ KN95 鼻梁机
 
 
 电话咨询 18703830130 
-微信咨询 18589077222（勿打电话给此号）""", "口罩")
+微信咨询 18589077222（勿打电话给此号）""", "口罩",[])

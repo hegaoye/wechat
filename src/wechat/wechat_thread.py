@@ -26,8 +26,6 @@ class WechatThread(threading.Thread):
             # self.post_wechat_info(myself_info, contacts, groups)
 
         while True:
-            sleep(1800)
-
             # 获取信息
             # info, contacts = self.try_get_task()
             info = """现货抢购
@@ -36,18 +34,18 @@ KN95 封边机
 KN95 点焊机
 KN95 鼻梁机
 
-全部现货，工厂直销可视频可看货可现场试机
-不含税不含发票诚意需要的请联系
-
-
 电话咨询 18703830130 
-微信咨询 18589077222（勿打电话给此号）"""
+微信咨询 18589077222（勿打电话给此号）
+
+全部现货，工厂直销可视频可看货可现场试机
+不含税不含发票诚意需要的请联系"""
 
             # contacts = ["立坤", "AAA . 立心", "小鹏", "伯融"]
             # 群发信息
             # self.wechat.batch_send_msg(info, contacts)
-            self.wechat.batch_send_msg_by_keyword(info, "口罩")
+            self.wechat.batch_send_msg_by_keyword(info, "口罩", except_contacts=["一家人", "口罩机销售"])
             # 休眠1分钟再尝试获取任务
+            sleep(1800)
 
     def try_get_task(self):
         """
