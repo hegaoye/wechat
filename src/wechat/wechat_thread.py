@@ -2,6 +2,7 @@ import threading
 from time import sleep
 
 from src.base import http
+from src.base.log4py import logger
 from src.wechat.wechat import Wechat
 
 
@@ -13,18 +14,11 @@ class WechatThread(threading.Thread):
     def __init__(self, ip):
         threading.Thread.__init__(self)
         self.ip = ip
-        self.wechat = None
+        self.wechat = Wechat(self.ip)
 
     def run(self):
-        if self.wechat is None:
-            print("开始控制ip", self.ip)
-            self.wechat = Wechat(self.ip)
-            # self.wechat.get_bottom_x_y()
-            # self.wechat.app_start()
-            # myself_info, contacts, groups = self.wechat.init_wx()
-            # print(groups)
-            # self.post_wechat_info(myself_info, contacts, groups)
-
+        logger.info("开始控制ip", self.ip)
+        # self.try_init_wx()
         while True:
             # 获取信息
             # info, contacts = self.try_get_task()
@@ -47,6 +41,16 @@ KN95 鼻梁机
             # 休眠1分钟再尝试获取任务
             sleep(1800)
 
+    def try_init_wx(self):
+        """
+        进行wx的初始化准备
+        :return:
+        """
+        self.wechat.app_start()
+        self.wechat.get_bottom_x_y()
+        myself_info, contacts, groups = self.wechat.init_wx()
+        self.post_wechat_info(myself_info, contacts, groups)
+
     def try_get_task(self):
         """
         尝试获取群发任务
@@ -60,6 +64,7 @@ KN95 鼻梁机
         """
         初始化时向云端发送基础数据
         """
+        logger.debug(myself_info, contacts, groups)
         data = {
             "myselfInfo": myself_info,
             "contact": contacts,

@@ -4,9 +4,17 @@ from time import sleep
 import re
 
 from src.base.appbase import AppBase
+from src.base.log4py import logger
 
 
 class Wechat(AppBase):
+    """"
+    用于控制 wechat 的封装，仅针对微信起作用，
+    一下各个方法中有的出现了 resourceId,text,description 等内容
+    用于获取元素，但这些可能发生变化，后期应存储于云端，采用云端配置，本地同步
+    的机制，并开启多线程进行检测，或者mq进行监听变化进行更新及时修复错误
+    """
+
     def __init__(self, ip):
         AppBase.__init__(self, ip)
         # 微信号
@@ -29,6 +37,7 @@ class Wechat(AppBase):
         sleep(.5)
         self.__try_to_find_wx_app()
         sleep(.5)
+        logger.debug("启动 wechat")
 
     def init_wx(self):
         """
@@ -38,9 +47,12 @@ class Wechat(AppBase):
         :return:
         """
         self.get_bottom_x_y()
+        logger.info("开始获取 微信账户信息")
         self.get_myself_info()
         myself_info = {"wxId": str(self.wx_id), "nickName": str(self.nick_name)}
+        logger.info("开始获取 通讯录信息")
         contacts = self.get_contact_info()
+        logger.info("开始获取 群 通讯录信息")
         groups = self.get_groups()
         return myself_info, contacts, groups
 
@@ -250,7 +262,7 @@ class Wechat(AppBase):
             sleep(.5)
             self.__get_search_force()
 
-    def open_search_result(self, name, try_nums=1) -> bool:
+    def open_search_result(self, name, try_nums=3) -> bool:
         """
         打开搜索的结果，并根据搜索的名字进行选择
         :param name: 搜索的名字
@@ -261,10 +273,10 @@ class Wechat(AppBase):
             result_element[0].click()
             return True
         else:
-            if try_nums == 3:
+            if try_nums <= 0:
                 return False
 
-            try_nums += 1
+            try_nums -= 1
             sleep(.5)
             return self.open_search_result(name, try_nums)
 
@@ -319,6 +331,7 @@ class Wechat(AppBase):
             msg_input.click()
             sleep(1)
             self.d.send_keys(msg)
+            logger.debug("发送消息内容为：", msg)
             sleep(1)
             # 点击发送
             send_button = self.d(resourceId="com.tencent.mm:id/amr")
@@ -338,6 +351,7 @@ class Wechat(AppBase):
         back_element = self.d(resourceId="com.tencent.mm:id/rm")
         if back_element.exists():
             # 点击左上角返回键
+            logger.debug("点击左上角返回上一页")
             back_element.click()
             sleep(.5)
         else:
@@ -354,10 +368,6 @@ class Wechat(AppBase):
         """
         if len(contact_list) <= 0:
             return False
-
-        flag = self.__send_first_page(text, contact_list)
-        if not flag:
-            return True
 
         self.__get_search_force()
 
@@ -392,28 +402,39 @@ class Wechat(AppBase):
         sleep(1)
         self.try_open_group_more()
         self.__group_chat(msg, except_contacts)
-        self.cancel_search()
+        self.back()
+        # self.cancel_search()
         sleep(.5)
-        self.cancel_search()
+        # self.cancel_search()
+        self.back()
 
-    def try_open_group_more(self, try_nums=0):
+    def try_open_group_more(self, try_nums=5):
+        """
+        打开更多群聊的搜索结果列表
+        :param try_nums: 尝试次数
+        """
         element = self.d(resourceId="com.tencent.mm:id/g6i", text="更多群聊")
         if element.exists():
             element.click()
             sleep(1)
         else:
-            if try_nums == 10:
+            if try_nums <= 0:
                 return
-            try_nums += 1
+            try_nums -= 1
             sleep(1)
             self.try_open_group_more(try_nums)
 
     def __group_chat(self, msg, except_contacts):
+        """
+        搜到的群聊列表，选择性打开，如果有例外的则自动排除
+        :param msg: 消息体
+        :param except_contacts: 例外列表
+        """
         group_chat_list = self.d(resourceId="com.tencent.mm:id/g8b")
         if len(group_chat_list) > 0:
             for group_chat in group_chat_list:
-                group_name = group_chat.get_text()
-                if str(group_name) in except_contacts:
+                group_name = str(group_chat.get_text())
+                if group_name in except_contacts:
                     continue
                 except_contacts.append(group_name)
                 if len(except_contacts) >= 80:
@@ -702,6 +723,7 @@ class Wechat(AppBase):
             self.d(resourceId="com.tencent.mm:id/dm3").click()
             sleep(.5)
             self.d(resourceId="com.tencent.mm:id/dm").click()
+            logger.error("短信验证错误，返回上一页")
             return True
         else:
             if try_nums <= 0:
@@ -712,7 +734,7 @@ class Wechat(AppBase):
 
 
 if __name__ == '__main__':
-    wechat = Wechat("192.168.0.28")
+    wechat = Wechat("192.168.0.23")
     # wechat.init_wx()
     # wechat.test()
     # wechat.unlock()
@@ -738,4 +760,4 @@ KN95 鼻梁机
 
 
 电话咨询 18703830130 
-微信咨询 18589077222（勿打电话给此号）""", "口罩",[])
+微信咨询 18589077222（勿打电话给此号）""", "口罩", [])
