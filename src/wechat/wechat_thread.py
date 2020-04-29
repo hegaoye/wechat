@@ -17,7 +17,7 @@ class WechatThread(threading.Thread):
         self.wechat = Wechat(self.ip)
 
     def run(self):
-        logger.info("开始控制ip", self.ip)
+        logger.info("开始控制ip:" + str(self.ip))
         # self.try_init_wx()
         while True:
             # 获取信息
@@ -64,7 +64,6 @@ KN95 鼻梁机
         """
         初始化时向云端发送基础数据
         """
-        logger.debug(myself_info, contacts, groups)
         data = {
             "myselfInfo": myself_info,
             "contact": contacts,

@@ -2,6 +2,7 @@
 import logging.config
 
 from settings import LOGGIN_CONF
+from src.wechat.factory import FactoryThread
 
 """
 入口启动文件类
@@ -10,7 +11,8 @@ from settings import LOGGIN_CONF
 
 class Main:
     def run(self):
-        pass
+        wxt = FactoryThread()
+        wxt.start()
 
 
 if __name__ == '__main__':

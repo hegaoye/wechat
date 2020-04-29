@@ -331,7 +331,7 @@ class Wechat(AppBase):
             msg_input.click()
             sleep(1)
             self.d.send_keys(msg)
-            logger.debug("发送消息内容为：", msg)
+            logger.debug("发送消息内容为：" + msg)
             sleep(1)
             # 点击发送
             send_button = self.d(resourceId="com.tencent.mm:id/amr")
