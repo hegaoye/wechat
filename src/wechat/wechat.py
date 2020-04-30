@@ -446,7 +446,8 @@ class Wechat(AppBase):
                 if len(except_contacts) >= 80:
                     return
                 group_chat.click()
-                self.send_msg(msg)
+                if msg:
+                    self.send_msg(msg)
 
             self.d(scrollable=True).scroll.vert.forward(steps=50)
             sleep(1)
@@ -738,6 +739,65 @@ class Wechat(AppBase):
             sleep(.5)
             return self.__try_force_sms_error_alert()
 
+    def clear_group_chat_cache(self, keyword, except_contacts):
+        """
+        清理本地的群聊缓存信息
+        """
+        # self.__get_search_force()
+        # self.d.send_keys(keyword)
+        # self.d(scrollable=True).scroll.vert.forward(steps=10)
+        # sleep(1)
+        # self.try_open_group_more()
+        self.__clear_group_cache(except_contacts)
+
+    def __clear_group_cache(self, except_contacts):
+        group_chat_list = self.d(resourceId="com.tencent.mm:id/g8b")
+        if len(group_chat_list) > 0:
+            for group_chat in group_chat_list:
+                group_name = group_chat.get_text()
+                if not group_name:
+                    continue
+
+                # 名字中出现 (数字) 的进行替换
+                group_name = re.sub(r"\(\d+\)$", "", str(group_name))
+                if group_name in except_contacts:
+                    continue
+
+                except_contacts.append(group_name)
+                if len(except_contacts) >= 80:
+                    return
+                group_chat.click()
+                sleep(.5)
+                # 打开群设置
+                self.d.xpath('//android.support.v7.widget.LinearLayoutCompat').click()
+                sleep(1)
+                # 清理聊天记录
+                self.__clear_chat_cache()
+
+            self.d(scrollable=True).scroll.vert.forward(steps=50)
+
+        sleep(1)
+        self.__clear_group_cache(except_contacts)
+
+    def __clear_chat_cache(self):
+        """
+        清理聊天记录
+        :return:
+        """
+        self.d(scrollable=True).fling.toEnd()
+        sleep(1)
+        # 点击清空聊天记录
+        self.d.xpath('//*[@resource-id="android:id/list"]/android.widget.LinearLayout[11]').click()
+        # self.d.xpath('//*[@resource-id="android:id/list"]/android.widget.LinearLayout[11]').click()
+        # self.d.xpath('//*[@resource-id="android:id/list"]/android.widget.LinearLayout[9]').click()
+        sleep(1)
+        # 点击确认清空
+        self.d(resourceId="com.tencent.mm:id/dm3", text="清空").click()
+        sleep(2)
+        self.back()
+        sleep(.5)
+        self.back()
+
 
 if __name__ == '__main__':
     wechat = Wechat("192.168.0.23")
@@ -755,6 +815,7 @@ if __name__ == '__main__':
     # wechat.batch_send_msg_by_search("""晚点和伯融一起聊下？""", ["AAA . 立心", "立坤"])
     # wechat.login_get_sms("15565063321")
     # wechat.login_input_sms("345567")
+    wechat.clear_group_chat_cache("口罩", [])
     wechat.batch_send_msg_by_keyword("""现货抢购
 
 KN95 封边机
