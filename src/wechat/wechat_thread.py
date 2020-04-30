@@ -2,6 +2,7 @@ import threading
 from time import sleep
 
 from src.base import http
+from src.base.api_url import Api
 from src.base.log4py import logger
 from src.wechat.wechat import Wechat
 
@@ -18,28 +19,15 @@ class WechatThread(threading.Thread):
 
     def run(self):
         logger.info("开始控制ip:" + str(self.ip))
-        # self.try_init_wx()
+        # 进行wx的初始化准备
+        self.try_init_wx()
         while True:
             # 获取信息
-            # info, contacts = self.try_get_task()
-            info = """现货抢购
-
-KN95 封边机
-KN95 点焊机
-KN95 鼻梁机
-
-电话咨询 18703830130 
-微信咨询 18589077222（勿打电话给此号）
-
-全部现货，工厂直销可视频可看货可现场试机
-不含税不含发票诚意需要的请联系"""
-
-            # contacts = ["立坤", "AAA . 立心", "小鹏", "伯融"]
+            info, contacts = self.try_get_task()
             # 群发信息
-            # self.wechat.batch_send_msg(info, contacts)
-            self.wechat.batch_send_msg_by_keyword(info, "口罩", except_contacts=["一家人", "口罩机销售","义济堂"])
+            self.wechat.batch_send_msg(info, contacts)
             # 休眠1分钟再尝试获取任务
-            sleep(1800)
+            sleep(60)
 
     def try_init_wx(self):
         """
@@ -56,7 +44,9 @@ KN95 鼻梁机
         尝试获取群发任务
         :return:
         """
-        beanret = http.get(url="http://xxxx.com/xxx.shtml?serialno=" + str(self.wechat.serial) + "&ip=" + str(self.ip))
+        beanret = http.get(url=str(Api.Get_Task_Url.value)
+                           .replace("{serialno}", str(self.wechat.serial))
+                           .replace("{ip}", str(self.ip)))
         if beanret.success:
             return beanret.data["info"], beanret.data["contacts"]
 
@@ -71,7 +61,7 @@ KN95 鼻梁机
             "ip": str(self.ip),
             "serialno": str(self.wechat.serial)
         }
-        http.post("http://xxxx.com/xxx.shtml", data=data)
+        http.post(Api.Wechat_Info_Url.value, data=data)
 
 
 if __name__ == '__main__':

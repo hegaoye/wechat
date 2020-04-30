@@ -2,6 +2,7 @@ import threading
 from time import sleep
 
 from src.base import http
+from src.base.api_url import Api
 from src.base.singleton import Singleton
 from src.wechat.wechat_thread import WechatThread
 
@@ -29,9 +30,7 @@ class FactoryThread(threading.Thread, Singleton):
         初始化连接设备
         :return:
         """
-        # todo 临时配置死，用于测试
-        ip_list = ["192.168.0.23", "192.168.0.28"]
-        # ip_list = self.__try_get_device()
+        ip_list = self.__try_get_device()
         if len(ip_list) <= 0: return
 
         # 排除已经上线的设备
@@ -60,14 +59,14 @@ class FactoryThread(threading.Thread, Singleton):
                 online_devices.append(online_device)
 
                 # 设备上线告知云端
-                # self.__device_online(online_devices)
+                self.__device_online(online_devices)
 
     def __try_get_device(self) -> list:
         """
         尝试获取设备进行上线链接
         :return:
         """
-        beanret = http.get(url="http://xxxx.com/device/new")
+        beanret = http.get(url=Api.Device_New_Url.value)
         if beanret.success:
             return beanret.data
 
@@ -77,7 +76,7 @@ class FactoryThread(threading.Thread, Singleton):
         :param ip_list: 设备ip
         :return:
         """
-        http.post("http://xxx.com/device/online", data={
+        http.post(Api.Device_Online_Url.value, data={
             "ip": ip_list
         })
 
