@@ -30,7 +30,7 @@ class FactoryThread(threading.Thread, Singleton):
         :return:
         """
         # todo 临时配置死，用于测试
-        ip_list = ["192.168.0.28", "192.168.0.23"]
+        ip_list = ["192.168.0.23", "192.168.0.28"]
         # ip_list = self.__try_get_device()
         if len(ip_list) <= 0: return
 

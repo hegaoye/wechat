@@ -433,9 +433,15 @@ class Wechat(AppBase):
         group_chat_list = self.d(resourceId="com.tencent.mm:id/g8b")
         if len(group_chat_list) > 0:
             for group_chat in group_chat_list:
-                group_name = str(group_chat.get_text())
+                group_name = group_chat.get_text()
+                if not group_name:
+                    continue
+
+                # 名字中出现 (数字) 的进行替换
+                group_name = re.sub(r"\(\d+\)$", "", str(group_name))
                 if group_name in except_contacts:
                     continue
+
                 except_contacts.append(group_name)
                 if len(except_contacts) >= 80:
                     return
@@ -760,4 +766,4 @@ KN95 鼻梁机
 
 
 电话咨询 18703830130 
-微信咨询 18589077222（勿打电话给此号）""", "口罩", [])
+微信咨询 18589077222（勿打电话给此号）""", "口罩", ["一家人", "口罩机销售"])
