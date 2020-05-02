@@ -451,6 +451,9 @@ class Wechat(AppBase):
             self.d(scrollable=True).scroll.vert.forward(steps=50)
             sleep(1)
             self.__group_chat(msg, except_contacts)
+        else:
+            sleep(1)
+            self.__group_chat(msg, except_contacts)
 
     def batch_send_msg(self, text, contact_list):
         """
@@ -740,7 +743,7 @@ class Wechat(AppBase):
 
 
 if __name__ == '__main__':
-    wechat = Wechat("192.168.0.23")
+    wechat = Wechat("192.168.0.28")
     # wechat.init_wx()
     # wechat.test()
     # wechat.unlock()

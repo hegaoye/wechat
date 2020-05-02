@@ -37,7 +37,7 @@ KN95 鼻梁机
             # contacts = ["立坤", "AAA . 立心", "小鹏", "伯融"]
             # 群发信息
             # self.wechat.batch_send_msg(info, contacts)
-            self.wechat.batch_send_msg_by_keyword(info, "口罩", except_contacts=["一家人", "口罩机销售","义济堂"])
+            self.wechat.batch_send_msg_by_keyword(info, "口罩", except_contacts=["一家人", "口罩机销售", "义济堂"])
             # 休眠1分钟再尝试获取任务
             sleep(1800)
 
