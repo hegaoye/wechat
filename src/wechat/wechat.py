@@ -743,7 +743,7 @@ class Wechat(AppBase):
 
 
 if __name__ == '__main__':
-    wechat = Wechat("192.168.0.28")
+    wechat = Wechat("192.168.0.23")
     # wechat.init_wx()
     # wechat.test()
     # wechat.unlock()
