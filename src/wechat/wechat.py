@@ -254,7 +254,7 @@ class Wechat(AppBase):
         获取搜索框的光标
         :return:
         """
-        search_element = self.d(resourceId="com.tencent.mm:id/dka", description="搜索")
+        search_element = self.d(resourceId="com.tencent.mm:id/f8y")
         if search_element.exists():
             search_element.click()
             sleep(1)
@@ -326,7 +326,8 @@ class Wechat(AppBase):
         :param msg: 消息文字信息
         """
         # 光标定位到输入框中
-        msg_input = self.d(resourceId="com.tencent.mm:id/g2p")
+        msg_input = self.d(resourceId="com.tencent.mm:id/g78")
+        # msg_input = self.d(resourceId="com.tencent.mm:id/g2p")
         if msg_input.exists():
             msg_input.click()
             sleep(1)
@@ -334,7 +335,8 @@ class Wechat(AppBase):
             logger.debug("发送消息内容为：" + msg)
             sleep(1)
             # 点击发送
-            send_button = self.d(resourceId="com.tencent.mm:id/amr")
+            send_button = self.d(resourceId="com.tencent.mm:id/anv")
+            # send_button = self.d(resourceId="com.tencent.mm:id/amr")
             if send_button.exists():
                 send_button.click()
                 sleep(1)
@@ -348,7 +350,8 @@ class Wechat(AppBase):
         """
         对话框返回
         """
-        back_element = self.d(resourceId="com.tencent.mm:id/rm")
+        back_element = self.d(resourceId="com.tencent.mm:id/rr")
+        # back_element = self.d(resourceId="com.tencent.mm:id/rm")
         if back_element.exists():
             # 点击左上角返回键
             logger.debug("点击左上角返回上一页")
@@ -408,12 +411,33 @@ class Wechat(AppBase):
         # self.cancel_search()
         self.back()
 
+    def batch_send_msg_and_photo_by_keyword(self, msg, keyword, except_contacts):
+        """
+        通过搜索关键词来对应群组
+        :param msg: 消息
+        :param keyword: 搜索关键词
+        :param except_contacts: 例外的通讯录
+        :return:
+        """
+        self.__get_search_force()
+        self.d.send_keys(keyword)
+        self.d(scrollable=True).scroll.vert.forward(steps=10)
+        sleep(1)
+        self.try_open_group_more()
+        self.__group_chat(msg, except_contacts, 4, is_photo=True)
+        self.back()
+        # self.cancel_search()
+        sleep(.5)
+        # self.cancel_search()
+        self.back()
+
     def try_open_group_more(self, try_nums=5):
         """
         打开更多群聊的搜索结果列表
         :param try_nums: 尝试次数
         """
-        element = self.d(resourceId="com.tencent.mm:id/g6i", text="更多群聊")
+        element = self.d(resourceId="com.tencent.mm:id/ga1", text="更多群聊")
+        # element = self.d(resourceId="com.tencent.mm:id/g6i", text="更多群聊")
         if element.exists():
             element.click()
             sleep(1)
@@ -424,13 +448,14 @@ class Wechat(AppBase):
             sleep(1)
             self.try_open_group_more(try_nums)
 
-    def __group_chat(self, msg, except_contacts):
+    def __group_chat(self, msg, except_contacts, photo_nums=0, is_photo=False):
         """
         搜到的群聊列表，选择性打开，如果有例外的则自动排除
         :param msg: 消息体
         :param except_contacts: 例外列表
         """
-        group_chat_list = self.d(resourceId="com.tencent.mm:id/g8b")
+        group_chat_list = self.d(resourceId="com.tencent.mm:id/gbv")
+        # group_chat_list = self.d(resourceId="com.tencent.mm:id/g8b")
         if len(group_chat_list) > 0:
             for group_chat in group_chat_list:
                 group_name = group_chat.get_text()
@@ -446,14 +471,17 @@ class Wechat(AppBase):
                 if len(except_contacts) >= 80:
                     return
                 group_chat.click()
+                if is_photo:
+                    self.send_photo(photo_nums)
+
                 self.send_msg(msg)
 
             self.d(scrollable=True).scroll.vert.forward(steps=50)
             sleep(1)
-            self.__group_chat(msg, except_contacts)
+            self.__group_chat(msg, except_contacts, photo_nums, is_photo)
         else:
             sleep(1)
-            self.__group_chat(msg, except_contacts)
+            self.__group_chat(msg, except_contacts, photo_nums, is_photo)
 
     def batch_send_msg(self, text, contact_list):
         """
@@ -741,6 +769,92 @@ class Wechat(AppBase):
             sleep(.5)
             return self.__try_force_sms_error_alert()
 
+    def send_photo(self, nums):
+        """
+        发送图片文件
+        :param nums:
+        :return:
+        """
+        self.click_plus_button()
+        sleep(.5)
+        self.open_photo_album()
+        sleep(.5)
+        self.choose_photo(nums)
+        self.send_choose_photo()
+
+    def click_plus_button(self, try_nums=3):
+        """
+        点击加号 选择更多
+        :param try_nums:
+        :return:
+        """
+        plus_button = self.d(resourceId="com.tencent.mm:id/aks")
+        if plus_button.exists():
+            plus_button.click()
+            return True
+        else:
+            if try_nums <= 0:
+                return False
+            try_nums -= 1
+            sleep(.5)
+            return self.click_plus_button()
+
+    def open_photo_album(self):
+        """
+        打开相册
+        :return:
+        """
+        # 相册路径
+        photo_album_button = self.d.xpath('//*[@resource-id="com.tencent.mm:id/pw"]/android.widget.LinearLayout[1]')
+        photo_album_button.click()
+
+    def close_photo_album(self, try_nums=3):
+        """
+        关闭相册
+        :param try_nums:
+        :return:
+        """
+        close_photo_button = self.d(resourceId='com.tencent.mm:id/dm')
+        if close_photo_button.exists():
+            close_photo_button.click()
+        else:
+            if try_nums <= 0:
+                return False
+            try_nums -= 1
+            sleep(.5)
+            self.close_photo_album()
+
+    def choose_photo(self, nums=1):
+        """
+        选择图片
+        :param nums: 数量
+        :return:
+        """
+        for num in range(nums):
+            xpath = '//*[@resource-id="com.tencent.mm:id/dm6"]/android.widget.RelativeLayout[' + str(
+                num + 1) + ']/android.widget.CheckBox[1]'
+            photo_checkbox = self.d.xpath(xpath)
+            photo_checkbox.click()
+            sleep(.5)
+
+        return True
+
+    def send_choose_photo(self, try_nums=3):
+        """
+        发送选中的图片文件
+        :param try_nums:
+        :return:
+        """
+        send_choose_button = self.d(resourceId='com.tencent.mm:id/ch')
+        if send_choose_button.exists():
+            send_choose_button.click()
+        else:
+            if try_nums <= 0:
+                return False
+            try_nums -= 1
+            sleep(.5)
+            self.send_choose_photo()
+
 
 if __name__ == '__main__':
     wechat = Wechat("192.168.0.23")
@@ -758,15 +872,24 @@ if __name__ == '__main__':
     # wechat.batch_send_msg_by_search("""晚点和伯融一起聊下？""", ["AAA . 立心", "立坤"])
     # wechat.login_get_sms("15565063321")
     # wechat.login_input_sms("345567")
-    wechat.batch_send_msg_by_keyword("""现货抢购
+    #     wechat.batch_send_msg_by_keyword("""现货抢购
+    #
+    # KN95 封边机
+    # KN95 点焊机
+    # KN95 鼻梁机
+    #
+    # 全部现货，工厂直销可视频可看货可现场试机
+    # 不含税不含发票诚意需要的请联系
+    #
+    #
+    # 电话咨询 18703830130
+    # 微信咨询 18589077222（勿打电话给此号）""", "口罩", ["一家人", "口罩机销售"])
 
-KN95 封边机
-KN95 点焊机
-KN95 鼻梁机
-
-全部现货，工厂直销可视频可看货可现场试机
-不含税不含发票诚意需要的请联系
-
-
-电话咨询 18703830130 
-微信咨询 18589077222（勿打电话给此号）""", "口罩", ["一家人", "口罩机销售"])
+    wechat.click_plus_button()
+    sleep(.5)
+    wechat.open_photo_album()
+    sleep(.5)
+    wechat.choose_photo(1)
+    sleep(.5)
+    wechat.send_choose_photo()
+    sleep(.5)
